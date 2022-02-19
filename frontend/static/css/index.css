@@ -1,24 +1,27 @@
 html, body{
-    margin: 0;
-    padding: 20px;
-    width: 100%;
+    
+    padding: auto;
+    padding-top: 20px;
+    width: 80%;
     background-color: rgb(131, 212, 226);
     margin: auto;
     align-items: center;
 
 }
-#main {
-    position: absolute;
+
+
+/* #main {
     width: 100%;
     align-self: center;
     margin: auto;
     
 
-}
-#app{
+} */
+
+/* #app{
     width:100%;
     height: 100%;
     display: flex;
     align-self: center;
 
-}
+} */

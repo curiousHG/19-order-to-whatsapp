@@ -9,6 +9,7 @@ import {
   RadioGroup,
   FormControlLabel,
   Button,
+  Box,
   Grid,
 } from "@material-ui/core";
 import { Link } from "react-router-dom";
@@ -37,30 +38,47 @@ export default class OrderPage extends Component {
         console.log(err);
       });
   }
+  // Post the data to the server
+  sendData() {
+    axios
+      .post("http://localhost:8000/store/order/", this.state.filled_data)
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
   render() {
     return (
-      <Grid container spacing={1}>
-        <Grid item xs = {12}>
-          <Typography variant="h4" component="h4" align="center" bgcolor="black">
-            Order Page
-          </Typography>
-          {this.state.details.map((item) => (
-            <CategoryList key={item.id} item={item} data={this.state.filled_data} />
-          ))}
+      <Grid item xs={12} maxwidth="200px">
+        <Typography variant="h4" component="h4" align="center" bgcolor="black">
+          Order Page
+        </Typography>
+        {this.state.details.map((item) => (
+          <CategoryList
+            key={item.id}
+            item={item}
+            data={this.state.filled_data}
+            padding={2}
+            style={{ color: "blue" }}
+          />
+        ))}
+        <Box textAlign="center">
           <Button
             variant="contained"
             color="primary"
             component={Link}
-            to="/home"
+            to="/final"
             onClick={() => {
-              console.log(this.state.filled_data);
+              // console.log(this.state.filled_data);
+              this.sendData();
             }}
-            style={{ alignSelf: "center" }}
           >
             Make Order
           </Button>
-        </Grid>
+        </Box>
       </Grid>
     );
   }
