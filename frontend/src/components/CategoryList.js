@@ -11,7 +11,7 @@ import Item from './Item';
 
 export default function CategoryList(props) {
   
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
 
   const handleClick = () => {
     setOpen(!open);
@@ -19,7 +19,7 @@ export default function CategoryList(props) {
 
   return (
     <List
-      sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
+      sx={{ width: '100%', maxWidth: 500, bgcolor: 'background.paper' }}
       component="nav"
       aria-labelledby="nested-list-subheader"
     >
@@ -30,10 +30,11 @@ export default function CategoryList(props) {
         <ListItemText primary= {props.item.name}/>
         {open ? <ExpandLess /> : <ExpandMore />}
       </ListItemButton>
+
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
           {props.item.products.map((item) => (
-            <Item key={item.id} item={item} />
+            <Item key={item.id} item={item} data = {props.data} />
           ))}
         </List>
       </Collapse>

@@ -21,6 +21,7 @@ export default class OrderPage extends Component {
   }
   state = {
     details: [],
+    filled_data: {},
   };
   componentDidMount() {
     let data;
@@ -40,12 +41,12 @@ export default class OrderPage extends Component {
   render() {
     return (
       <Grid container spacing={1}>
-        <Grid item xs={12} align="center">
-          <Typography variant="h4" component="h4">
+        <Grid item xs = {12}>
+          <Typography variant="h4" component="h4" align="center" bgcolor="black">
             Order Page
           </Typography>
           {this.state.details.map((item) => (
-            <CategoryList key={item.id} item={item} />
+            <CategoryList key={item.id} item={item} data={this.state.filled_data} />
           ))}
           <Button
             variant="contained"
@@ -53,7 +54,7 @@ export default class OrderPage extends Component {
             component={Link}
             to="/home"
             onClick={() => {
-              this.props.history.push("/home");
+              console.log(this.state.filled_data);
             }}
             style={{ alignSelf: "center" }}
           >
