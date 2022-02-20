@@ -70,7 +70,17 @@ export default class OrderPage extends Component {
           />
         ))}
         <Box textAlign="center">
-          <Button
+          <Link to={{ pathname: "/final", state: this.state.filled_data }}>
+            <Button
+
+              variant="contained"
+              color="primary"
+              onClick={() => this.sendData()}
+            >
+              Make Order
+            </Button>
+          </Link>
+          {/* <Button
             variant="contained"
             color="primary"
             component={Link}
@@ -79,7 +89,7 @@ export default class OrderPage extends Component {
 
           >
             Final Page
-          </Button>
+          </Button> */}
         </Box>
       </Grid>
     );
