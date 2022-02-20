@@ -15,6 +15,8 @@ import {
 import { Link } from "react-router-dom";
 import CategoryList from "./CategoryList";
 import axios from "axios";
+axios.defaults.xsrfHeaderName = "X-CSRFToken";
+axios.defaults.xsrfCookieName = "csrftoken";
 
 export default class OrderPage extends Component {
   constructor(props) {
@@ -43,10 +45,12 @@ export default class OrderPage extends Component {
     axios
       .post("http://localhost:8000/store/order/", this.state.filled_data)
       .then((res) => {
-        console.log(res);
+        this.props.history.push("/final");
+
+        
       })
       .catch((err) => {
-        console.log(err);
+        // console.log(err);
       });
   }
 
@@ -70,13 +74,11 @@ export default class OrderPage extends Component {
             variant="contained"
             color="primary"
             component={Link}
-            to="/final"
-            onClick={() => {
-              // console.log(this.state.filled_data);
-              this.sendData();
-            }}
+            to={{ pathname: '/final', state: { order: this.state.filled_data } }}
+            onClick={() => this.sendData()}
+
           >
-            Make Order
+            Final Page
           </Button>
         </Box>
       </Grid>
