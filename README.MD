@@ -1,10 +1,6 @@
 # 19-order-to-whatsapp
 
 ### To run the project
-'''
-
-    source venv/bin/activate
-    python3 manage.py runserver
 ### Commands
 
 1. To run the backend
