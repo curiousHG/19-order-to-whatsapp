@@ -19,7 +19,13 @@ export default function CategoryList(props) {
 
   return (
     <List
-      sx={{ width: '100%', bgcolor: 'background.paper' }}
+      sx={{ 
+        width: '100%', 
+        backgroundColor: '#dfd661',
+        padding: '2px',
+        borderRadius: '10px',
+        margin: '10px',
+      }}
       component="nav"
       aria-labelledby="nested-list-subheader"
     >

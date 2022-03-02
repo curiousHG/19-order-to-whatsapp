@@ -12,6 +12,7 @@ import {
   Button,
   Box,
 } from "@material-ui/core";
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 
 export default class FinalPage extends Component {
   constructor(props) {
@@ -71,11 +72,10 @@ export default class FinalPage extends Component {
         <Box textAlign="center">
             <Button
               variant="contained"
-              color="primary"
+              color="green"
+              href={this.state.pathname}
             >
-              <a href={this.state.pathname}>
-                Order
-              </a>
+              <WhatsAppIcon />
             </Button>
         </Box>
       </div>

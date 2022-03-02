@@ -17,7 +17,7 @@ export default class Item extends Component {
     return (
       <ListItemButton sx={{ pl: 2 }}>
         <ListItemIcon sx={{ textAlign: "right" }}>
-          <img src={this.props.item.image} width="150" height="100" />
+          <img src={this.props.item.image} width="100" height="60" />
         </ListItemIcon>
         <ListItemText
           primary={this.props.item.name}
