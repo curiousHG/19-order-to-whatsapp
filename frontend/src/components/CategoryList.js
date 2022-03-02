@@ -11,7 +11,7 @@ import Item from './Item';
 
 export default function CategoryList(props) {
   
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(false);
 
   const handleClick = () => {
     setOpen(!open);

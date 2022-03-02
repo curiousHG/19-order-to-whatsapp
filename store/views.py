@@ -17,7 +17,7 @@ class ProductsView(APIView):
     
 class OrderView(APIView):
     def post(self, request):
-        print(request.data)
+        # print(request.data)
         return Response(request.data)
 
 class Category(generics.ListCreateAPIView):

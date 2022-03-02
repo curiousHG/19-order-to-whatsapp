@@ -26,12 +26,21 @@ export default class OrderPage extends Component {
     details: [],
     filled_data: {},
   };
+  useLocalStorage(key, value) {
+    if (value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    } else {
+      let data = localStorage.getItem(key);
+      return JSON.parse(data);
+    }
+  }
   componentDidMount() {
     let data;
     axios
       .get("http://localhost:8000/store/category")
       .then((res) => {
         data = res.data;
+        // console.log(data);
         this.setState({
           details: data,
         });
@@ -42,16 +51,15 @@ export default class OrderPage extends Component {
   }
   // Post the data to the server
   sendData() {
-    axios
-      .post("http://localhost:8000/store/order/", this.state.filled_data)
-      .then((res) => {
-        this.props.history.push("/final");
-
-        
-      })
-      .catch((err) => {
-        // console.log(err);
-      });
+    this.useLocalStorage("order", this.state.filled_data);
+    // axios
+    //   .post("http://localhost:8000/store/order/", this.state.filled_data)
+    //   .then((res) => {
+    //     this.useLocalStorage("order", this.state.filled_data);
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
   }
 
   render() {
@@ -72,24 +80,15 @@ export default class OrderPage extends Component {
         <Box textAlign="center">
           <Link to={{ pathname: "/final", state: this.state.filled_data }}>
             <Button
-
               variant="contained"
               color="primary"
-              onClick={() => this.sendData()}
+              onClick={() => {
+                this.sendData();
+              }}
             >
-              Make Order
+              Order
             </Button>
           </Link>
-          {/* <Button
-            variant="contained"
-            color="primary"
-            component={Link}
-            to={{ pathname: '/final', state: { order: this.state.filled_data } }}
-            onClick={() => this.sendData()}
-
-          >
-            Final Page
-          </Button> */}
         </Box>
       </Grid>
     );
