@@ -1,27 +1,32 @@
-import { resolve } from 'path';
-import { DefinePlugin } from 'webpack';
+const path = require("path");
+const webpack = require("webpack");
 
-export const entry = "./src/index.js";
-export const output = {
-    path: resolve(__dirname, './static/frontend'),
+module.exports = {
+  entry: "./src/index.js",
+  output: {
+    path: path.resolve(__dirname, "./static/frontend"),
     filename: "[name].js",
-};
-export const module = {
+  },
+  module: {
     rules: [
-        {
-            test: /\.js$/,
-            exclude: /node_modules/,
-            use: {
-                loader: "babel-loader",
-            },
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader",
         },
+      },
     ],
-};
-export const optimization = {
+  },
+  optimization: {
     minimize: true,
-};
-export const plugins = [
-    new DefinePlugin({
-        "process.env:NODE.ENV": JSON.stringify("production")
+  },
+  plugins: [
+    new webpack.DefinePlugin({
+      "process.env": {
+        // This has effect on the react lib size
+        NODE_ENV: JSON.stringify("production"),
+      },
     }),
-];
+  ],
+};
