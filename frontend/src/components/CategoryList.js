@@ -20,7 +20,7 @@ export default function CategoryList(props) {
   return (
     <List
       sx={{ 
-        width: '100%', 
+        width: '50%', 
         backgroundColor: '#dfd661',
         padding: '2px',
         borderRadius: '10px',

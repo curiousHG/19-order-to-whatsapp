@@ -2,12 +2,6 @@ import React, { Component } from "react";
 import Item from "./Item";
 import {
   Typography,
-  TextField,
-  FormControl,
-  FormHelperText,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
   Button,
   Box,
   Grid,
@@ -15,6 +9,7 @@ import {
 import { Link } from "react-router-dom";
 import CategoryList from "./CategoryList";
 import axios from "axios";
+import SearchAppBar from "./NavBar";
 axios.defaults.xsrfHeaderName = "X-CSRFToken";
 axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -65,9 +60,10 @@ export default class OrderPage extends Component {
   render() {
     return (
       <Grid item xs={12} maxwidth="200px">
-        <Typography variant="h4" component="h4" align="center" bgcolor="black">
+        <SearchAppBar />
+        {/* <Typography variant="h4" component="h4" align="center" bgcolor="black">
           Order Page
-        </Typography>
+        </Typography> */}
         {this.state.details.map((item) => (
           <CategoryList
             key={item.id}
