@@ -24,6 +24,8 @@ export default class Item extends Component {
           sx={{
             textAlign: "center",
             fontSize: "2rem",
+            fontWeight: "bold",
+            color: "white"
           }}
         />
         <TextField

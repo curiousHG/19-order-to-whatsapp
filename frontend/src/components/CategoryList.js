@@ -1,16 +1,15 @@
-import * as React from 'react';
-import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Collapse from '@mui/material/Collapse';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import Item from './Item';
+import * as React from "react";
+import List from "@mui/material/List";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Collapse from "@mui/material/Collapse";
+import InboxIcon from "@mui/icons-material/MoveToInbox";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import Item from "./Item";
 
 export default function CategoryList(props) {
-  
   const [open, setOpen] = React.useState(false);
 
   const handleClick = () => {
@@ -19,28 +18,35 @@ export default function CategoryList(props) {
 
   return (
     <List
-      sx={{ 
-        width: '50%', 
-        backgroundColor: '#dfd661',
-        padding: '2px',
-        borderRadius: '10px',
-        margin: '10px',
+      sx={{
+        width: "100%",
+        backgroundColor: "#00a7ff",
+        padding: "2px",
+        borderRadius: "10px",
+        margin: "10px",
       }}
       component="nav"
       aria-labelledby="nested-list-subheader"
     >
       <ListItemButton onClick={handleClick}>
-        <ListItemIcon>
+        {/* <ListItemIcon>
           <InboxIcon />
-        </ListItemIcon>
-        <ListItemText primary= {props.item.name}/>
+        </ListItemIcon> */}
+        <ListItemText
+          sx={{
+            fontSize: "2rem",
+            fontWeight: "bold",
+            color: "white",
+          }}
+          primary={props.item.name}
+        />
         {open ? <ExpandLess /> : <ExpandMore />}
       </ListItemButton>
 
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
           {props.item.products.map((item) => (
-            <Item key={item.id} item={item} data = {props.data} />
+            <Item key={item.id} item={item} data={props.data} />
           ))}
         </List>
       </Collapse>
