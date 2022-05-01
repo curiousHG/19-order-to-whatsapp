@@ -16,22 +16,18 @@ export default class Item extends Component {
   render() {
     return (
       <ListItemButton sx={{ pl: 2 }}>
-        <ListItemIcon sx={{ textAlign: "right" }}>
+        {/* <ListItemIcon sx={{ textAlign: "right" }}>
           <img src={this.props.item.image} width="100" height="60" />
-        </ListItemIcon>
+        </ListItemIcon> */}
         <ListItemText
           primary={this.props.item.name}
-          sx={{
-            textAlign: "center",
-            fontSize: "2rem",
-            fontWeight: "bold",
-            color: "white"
-          }}
+          primaryTypographyProps = {{fontSize: "2.5rem"}}
+          style={{ textAlign: "left", color:"white"}}
         />
         <TextField
           value={this.props.data[this.props.item.name]}
           onChange={this.onChange}
-          inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+          // inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
           variant="outlined"
           sx={{
             width: "20%",
