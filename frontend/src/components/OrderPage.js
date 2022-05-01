@@ -4,6 +4,9 @@ import { Link } from "react-router-dom";
 import CategoryList from "./CategoryList";
 import axios from "axios";
 import Sidebar from "./Sidebar";
+import logo from "./images/logo.jpg";
+import Card from "@mui/material/Card";
+import CardMedia from "@mui/material/CardMedia";
 axios.defaults.xsrfHeaderName = "X-CSRFToken";
 axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -48,10 +51,26 @@ export default class OrderPage extends Component {
   render() {
     return (
       <>
-        <Grid container spacing={0}>
-          <Grid item xs={4} overflow = "hidden">
-            <Sidebar info={this.state.details} />
-            <Box textAlign="center">
+        <Grid container spacing={1}>
+          <Grid item xs={4} style = {{position:"sticky", zIndex:1, top:0}}>
+          <Card>
+          <CardMedia
+            component="img"
+            image={logo}
+            title="Logo"
+            sx={{
+              width: "100%",
+              height: "100%",
+              backgroundSize: "contain",
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "center",
+              margin: "0 auto",
+              borderRadius: "10px",
+              shadow: "2px 2px 5px #000000",
+            }}
+          />
+        </Card>
+          <Box textAlign="center">
               <Link
                 to={{ pathname: "/final", state: this.state.filled_data }}
                 style={{ textDecoration: "none" }}
@@ -63,10 +82,12 @@ export default class OrderPage extends Component {
                     this.sendData();
                   }}
                 >
-                  <Typography variant="h6">Confirm Order</Typography>
+                  <Typography variant="h3">Confirm Order</Typography>
                 </Button>
               </Link>
             </Box>
+            <Sidebar info={this.state.details} />
+            
           </Grid>
           <Grid item xs={8}>
             {this.state.details.map((item) => (

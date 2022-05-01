@@ -33,6 +33,7 @@ export default class Item extends Component {
             width: "20%",
             height: "10%",
             margin: "0 auto",
+            backgroundColor: "white",
           }}
         />
       </ListItemButton>

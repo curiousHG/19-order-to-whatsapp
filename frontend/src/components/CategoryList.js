@@ -20,34 +20,26 @@ export default function CategoryList(props) {
   return (
     <div id={props.item.name}>
       <Box
-        sx={{
-          width: "100%",
-          backgroundColor: "darkblue",
-          padding: "2px",
-          borderRadius: "10px",
-          color: "white",
-          margin: "10px",
-        }}
-      >
-        <Typography
-          variant="h4"
-          align="center"
-          sx={{
-            fontSize: "1.5rem",
-            fontWeight: "bold",
+        justifyContent="center"
+        alignItems="center"
+        style={
+          {
+            backgroundColor: "darkred",
+            borderRadius: "10px",
+            margin: "10px",
+            padding: "10px",
             color: "white",
-          }}
-        >
-          {props.item.name}
-        </Typography>
+          }
+        }
+      >
+        <Typography align="center" variant = "h3">{props.item.name}</Typography>
       </Box>
       <List
-        sx={{
+        style={{
           width: "100%",
           backgroundColor: "#00a7ff",
           padding: "2px",
           // borderRadius: "1px",
-          margin: "10px",
         }}
         component="nav"
         aria-labelledby="nested-list-subheader"

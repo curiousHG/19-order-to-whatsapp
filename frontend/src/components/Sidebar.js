@@ -11,7 +11,7 @@ export default class Sidebar extends Component {
   render() {
     return (
       <div>
-        <Card>
+        {/* <Card>
           <CardMedia
             component="img"
             image={logo}
@@ -27,7 +27,7 @@ export default class Sidebar extends Component {
               shadow: "2px 2px 5px #000000",
             }}
           />
-        </Card>
+        </Card> */}
         <div className="sidebar" >
           {this.props.info.map((item) => {
             return <SidebarLink key={item.id} text={item.name} />;
