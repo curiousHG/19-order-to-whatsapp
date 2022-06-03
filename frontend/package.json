@@ -9,6 +9,10 @@
     "dev": "webpack --mode development --watch",
     "build": "webpack --mode production"
   },
+  "engines": {
+    "node": "17.9.0",
+    "npm":"8.5.5"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
