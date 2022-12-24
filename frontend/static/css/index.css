@@ -25,6 +25,17 @@ body {
     transition: color 100ms ease-out;
 }
 
+#fixed-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    grid-gap: 10px;
+    padding: 10px;
+    height: 100%;
+    /* make scrollable up to 600px */
+    max-height: 600px;
+}
+
 .sidebar {
     /* width: 250px; */
     /* min-width: 200px; */

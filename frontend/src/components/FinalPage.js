@@ -31,7 +31,7 @@ export default class FinalPage extends Component {
   }
   componentDidMount() {
     const order = JSON.parse(localStorage.getItem("order"));
-    var pathname = "http://wa.me/919811572962?text=Item%20Quantity%0A";
+    var pathname = "http://wa.me/917982743323?text=Item%20Quantity%0A";
     for (let key in order) {
       // Chai%20Patti%2020Kg
       pathname += key + "%20" + order[key] + "%0A";
@@ -71,7 +71,7 @@ export default class FinalPage extends Component {
               </TableRow>
             </TableHead>
             <TableBody>
-              <TableRow>
+              {/* <TableRow>
                 <TableCell
                   align="center"
                   style={{fontSize: "1.5rem" }}
@@ -84,17 +84,18 @@ export default class FinalPage extends Component {
                 >
                   400 gm
                 </TableCell>
-              </TableRow>
+              </TableRow> */}
               {Object.keys(this.state.order).map((key) => {
                 return (
                   <TableRow>
-                    <TableCell align="center" style={{ top: 57 }}>
+                    <TableCell align="center" style={{ fontSize: "1.5rem" }}>
                       {key}
                     </TableCell>
-                    <TableCell align="center" style={{ top: 57 }}>
+                    <TableCell align="center" style={{ fontSize: "1.5rem" }}>
                       {this.state.order[key]}
                     </TableCell>
                   </TableRow>
+                
                 );
               })}
             </TableBody>
@@ -106,7 +107,9 @@ export default class FinalPage extends Component {
             <Typography variant="h6"> Send to Whatsapp</Typography>
           </Button>
         </Box>
-        <Typography variant="h4" textAlign="center">Thank you for your order!</Typography>
+        <Typography variant="h4" textAlign="center">
+          Thank you for your order!
+        </Typography>
       </div>
     );
   }

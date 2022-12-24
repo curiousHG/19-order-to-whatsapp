@@ -52,25 +52,28 @@ export default class OrderPage extends Component {
     return (
       <>
         <Grid container spacing={1}>
-          <Grid item xs={4} style = {{position:"sticky", zIndex:1, top:0}}>
-          <Card>
-          <CardMedia
-            component="img"
-            image={logo}
-            title="Logo"
-            sx={{
-              width: "100%",
-              height: "100%",
-              backgroundSize: "contain",
-              backgroundRepeat: "no-repeat",
-              backgroundPosition: "center",
-              margin: "0 auto",
-              borderRadius: "10px",
-              shadow: "2px 2px 5px #000000",
-            }}
-          />
-        </Card>
-          <Box textAlign="center">
+          <Grid item xs={4} style={{  }}>
+            <Card>
+              <CardMedia
+                component="img"
+                image={logo}
+                title="Logo"
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  backgroundSize: "contain",
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "center",
+                  margin: "0 auto",
+                  borderRadius: "10px",
+                  shadow: "2px 2px 5px #000000",
+                }}
+              />
+            </Card>
+            <div style={{maxHeight: "100vh", overflowY: "auto"}}>
+              <Sidebar info={this.state.details} />
+            </div>
+            <Box textAlign="center">
               <Link
                 to={{ pathname: "/final", state: this.state.filled_data }}
                 style={{ textDecoration: "none" }}
@@ -86,10 +89,8 @@ export default class OrderPage extends Component {
                 </Button>
               </Link>
             </Box>
-            <Sidebar info={this.state.details} />
-            
           </Grid>
-          <Grid item xs={8}>
+          <Grid item xs={8} style={{ marginLeft: "34%" }}>
             {this.state.details.map((item) => (
               <CategoryList
                 key={item.id}

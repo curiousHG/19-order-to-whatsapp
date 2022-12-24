@@ -27,7 +27,7 @@ export default class SidebarLink extends Component {
           style={{
             textDecoration: "none",
             color: "white",
-            fontSize: "3rem",
+            fontSize: "2rem",
             fontStyle: "italic",
           }}
         >
