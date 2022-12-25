@@ -52,7 +52,7 @@ export default class OrderPage extends Component {
     return (
       <>
         <Grid container spacing={1}>
-          <Grid item xs={4} style={{  }}>
+          <Grid item xs={4}>
             <Card>
               <CardMedia
                 component="img"
@@ -90,7 +90,7 @@ export default class OrderPage extends Component {
               </Link>
             </Box>
           </Grid>
-          <Grid item xs={8} style={{ marginLeft: "34%" }}>
+          <Grid item xs={8}>
             {this.state.details.map((item) => (
               <CategoryList
                 key={item.id}
