@@ -41,9 +41,10 @@ body {
     /* min-width: 200px; */
     padding: 10px 20px;
     margin: 10px 0 auto;
+    margin-bottom: 10px;
     box-shadow: 0 0 6px hsl(210 14% 90%);
     border-color: black;
-    background-color: #c0a22c;
+    background-color: #36ae36;
 }
 
 .flex-section {

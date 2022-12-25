@@ -70,9 +70,9 @@ export default class OrderPage extends Component {
                 }}
               />
             </Card>
-            <div style={{maxHeight: "100vh", overflowY: "auto"}}>
-              <Sidebar info={this.state.details} />
-            </div>
+
+            <Sidebar info={this.state.details} />
+
             <Box textAlign="center">
               <Link
                 to={{ pathname: "/final", state: this.state.filled_data }}
@@ -91,15 +91,17 @@ export default class OrderPage extends Component {
             </Box>
           </Grid>
           <Grid item xs={8}>
-            {this.state.details.map((item) => (
-              <CategoryList
-                key={item.id}
-                item={item}
-                data={this.state.filled_data}
-                padding={2}
-                style={{ color: "blue" }}
-              />
-            ))}
+            <div style={{ maxHeight: "100vh", overflowY: "auto" }}>
+              {this.state.details.map((item) => (
+                <CategoryList
+                  key={item.id}
+                  item={item}
+                  data={this.state.filled_data}
+                  padding={2}
+                  style={{ color: "blue" }}
+                />
+              ))}
+            </div>
           </Grid>
         </Grid>
       </>
