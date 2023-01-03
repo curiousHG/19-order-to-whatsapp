@@ -3,7 +3,7 @@ body {
     /* padding: auto; */
     width: 100%;
     /* margin: auto; */
-    background-color: #fefea1;
+    background-color: #e8e875;
 }
 
 .link {
@@ -44,7 +44,11 @@ body {
     margin-bottom: 10px;
     box-shadow: 0 0 6px hsl(210 14% 90%);
     border-color: black;
-    background-color: #36ae36;
+    background-color: #f14d52;
+}
+
+.list {
+    background-color: #5587fa;
 }
 
 .flex-section {

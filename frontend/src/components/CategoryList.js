@@ -34,10 +34,11 @@ export default function CategoryList(props) {
       >
         <Typography align="center" variant = "h3">{props.item.name}</Typography>
       </Box>
+      <div class = "list">
       <List
         style={{
           width: "100%",
-          backgroundColor: "#00a7ff",
+          // backgroundColor: "#f5f5f5",
           padding: "2px",
           // borderRadius: "1px",
         }}
@@ -60,7 +61,7 @@ export default function CategoryList(props) {
       </ListItemButton> */}
 
         {/* <Collapse in={open} timeout="auto" unmountOnExit> */}
-
+        
         <List component="div" disablePadding>
           {/* <ListItemText
           sx={{
@@ -76,8 +77,8 @@ export default function CategoryList(props) {
             <Item key={item.id} item={item} data={props.data} />
           ))}
         </List>
-        {/* </Collapse> */}
       </List>
+      </div>
     </div>
   );
 }
