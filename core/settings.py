@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-jzf&g27u%23e7fd+=yf+=)3kf5)-8&tfo7d)6mxkn^pz4_1iz)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["localhost","127.0.0.1","19-order-to-whatsapp-production.up.railway.app"]
 CORS_ORIGIN_WHITELIST = [
