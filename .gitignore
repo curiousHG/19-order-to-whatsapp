@@ -1,6 +1,6 @@
 frontend/node_modules
 *.sqlite3
-*/__pycache__
+**/__pycache__
 data
 
 # All DS_Store files
