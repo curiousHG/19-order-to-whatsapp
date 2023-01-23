@@ -8,4 +8,5 @@ data
 .vscode
 node_modules
 config
-staticfiles
+# staticfiles
+# static
