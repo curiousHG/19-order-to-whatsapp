@@ -19,7 +19,7 @@ export default class FinalPage extends Component {
   }
   state = {
     order: {},
-    pathname: "http://wa.me/917982743323?",
+    pathname: "http://wa.me/919811572962?",
   };
   useLocalStorage(key, value) {
     if (value) {
@@ -31,7 +31,7 @@ export default class FinalPage extends Component {
   }
   componentDidMount() {
     const order = JSON.parse(localStorage.getItem("order"));
-    var pathname = "http://wa.me/917982743323?text=Item%20Quantity%0A";
+    var pathname = "http://wa.me/919811572962?text=Item%20Quantity%0A";
     for (let key in order) {
       // Chai%20Patti%2020Kg
       pathname += key + "%20" + order[key] + "%0A";
