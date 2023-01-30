@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from django.conf import settings
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+env = load_dotenv()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,7 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-jzf&g27u%23e7fd+=yf+=)3kf5)-8&tfo7d)6mxkn^pz4_1iz)"
+# SECRET_KEY = "django-insecure-jzf&g27u%23e7fd+=yf+=)3kf5)-8&tfo7d)6mxkn^pz4_1iz)"
+SECRET_KEY = os.getenv("SECRET_KEY")
+# print(SECRET_KEY)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -31,7 +36,6 @@ ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     "19-order-to-whatsapp-production.up.railway.app",
-    "19-order-to-whatsapp.vercel.app",
     "19onlineShop.com",
     "075e-2405-201-4006-9cde-249d-4cec-8fb2-222d.in.ngrok.io"
 ]
@@ -110,11 +114,11 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'railway',
+            'NAME': os.getenv("DB_NAME"),
             'USER': 'postgres',
-            'PASSWORD': 'nyvh8OmdUKaHMmgBEaNj',
-            'HOST': 'containers-us-west-52.railway.app',
-            'PORT': '5517',
+            'PASSWORD': os.getenv("DB_PASSWORD"),
+            'HOST': os.getenv("DB_HOST"),
+            'PORT': os.getenv("DB_PORT"),
         }
     }
 

@@ -14,3 +14,4 @@ data.json
 Makefile
 requirement.txt
 csv_data_add.py
+.env
