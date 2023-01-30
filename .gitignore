@@ -1,5 +1,5 @@
 frontend/node_modules
-# *.sqlite3
+*.sqlite3
 **/__pycache__
 data
 venv/
@@ -10,3 +10,7 @@ node_modules
 config
 # staticfiles
 # static
+data.json
+Makefile
+requirement.txt
+csv_data_add.py

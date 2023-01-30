@@ -73,6 +73,7 @@ export default function CategoryList(props) {
           }}
           primary={props.item.name}
         /> */}
+          {/* {console.log(props.item.products)} */}
           {props.item.products.map((item) => (
             <Item key={item.id} item={item} data={props.data} />
           ))}
