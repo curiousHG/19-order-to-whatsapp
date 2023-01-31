@@ -37,7 +37,7 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "19-order-to-whatsapp-production.up.railway.app",
     "19onlineShop.com",
-    "075e-2405-201-4006-9cde-249d-4cec-8fb2-222d.in.ngrok.io"
+    "1bec-103-27-8-107.in.ngrok.io"
 ]
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000",
@@ -100,8 +100,9 @@ WSGI_APPLICATION = "core.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASE = 2
-if DATABASE == 1:
+DEBUG = os.getenv("DEBUG")
+if DEBUG == "True":
+    print("DEBUG MODE")
 
     DATABASES = {
         "default": {

@@ -30,7 +30,7 @@ class Product(models.Model):
         KG = "KG", "Kilogram"
         LTR = "LTR", "Liter"
         GM = "GM", "Gram"
-        PACKET = "PACKET", "Packet"
+        PC = "Pc", "Pc"
         # allow to add more choices
 
 
