@@ -22,3 +22,5 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 step 6: run python manage.py collectstatic
 
 step 7: push to github and try to redeploy
+
+
