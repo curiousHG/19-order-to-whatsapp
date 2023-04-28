@@ -65,8 +65,8 @@ const Bill = () => {
 
     return (
         <>
-            {/* <h1>Bill</h1> */}
-            <div
+            <h1>Bill</h1>
+            {/* <div
                 style={{
                     display: "flex",
                     alignSelf: "center",
@@ -96,7 +96,7 @@ const Bill = () => {
                         </div>
                     ))}
                 </div>
-            </div>
+            </div> */}
             {/* {data.map((item) => (
                 <div>
                     <h1>{item.name}</h1>

@@ -31,6 +31,8 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
 DEBUG = os.getenv("DEBUG")
+DEBUG = DEBUG == "True"
+# print(type(DEBUG))
 
 ALLOWED_HOSTS = [
     "www.19onlineshop.com",
@@ -105,7 +107,7 @@ WSGI_APPLICATION = "core.wsgi.application"
 
 
 
-if DEBUG == "True":
+if DEBUG:
     print("DEBUG MODE")
 
     DATABASES = {
