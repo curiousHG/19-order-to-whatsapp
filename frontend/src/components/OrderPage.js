@@ -52,7 +52,7 @@ export default class OrderPage extends Component {
     return (
       <div style={{ width: "100%", overflowX: "hidden" }}>
        {/* Hello */}
-        <Grid container spacing={1} style = {{width:"100%"}}>
+        <Grid container spacing={1}>
           <Grid item xs={4}>
             <Card>
               <CardMedia

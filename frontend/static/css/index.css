@@ -1,8 +1,6 @@
 html,
 body {
-    /* padding: auto; */
     width: 100%;
-    /* margin: auto; */
     background-color: #e8e875;
 }
 
@@ -47,9 +45,6 @@ body {
     background-color: #f14d52;
 }
 
-.list {
-    background-color: #5587fa;
-}
 
 .flex-section {
     flex-grow: 1;

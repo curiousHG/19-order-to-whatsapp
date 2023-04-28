@@ -35,52 +35,22 @@ export default function CategoryList(props) {
       >
         <Typography align="center" variant="h3">{props.item.name}</Typography>
       </Box>
-      <div class="list">
-        <List
-          style={{
-            width: "100%",
-            // backgroundColor: "#f5f5f5",
-            padding: "2px",
-            // borderRadius: "1px",
-          }}
-          component="nav"
-          aria-labelledby="nested-list-subheader"
-        >
-          {/* <ListItemButton onClick={handleClick}>
-        <ListItemIcon>
-          <InboxIcon />
-        </ListItemIcon>
-        <ListItemText
-          sx={{
-            fontSize: "2rem",
-            fontWeight: "bold",
-            color: "white",
-          }}
-          primary={props.item.name}
-        />
-        {open ? <ExpandLess /> : <ExpandMore />}
-      </ListItemButton> */}
 
-          {/* <Collapse in={open} timeout="auto" unmountOnExit> */}
+      <List
+        style={{
+          width: "100%",
+          backgroundColor: "#5587fa",
+          padding: "2px",
+          borderBottomLeftRadius: "10px",
+          borderBottomRightRadius: "10px",
+          marginBottom: "10px",
 
-          <List component="div" disablePadding>
-            {/* <ListItemText
-          sx={{
-            fontSize: "2rem",
-            fontWeight: "bold",
-            color: "black",
-            alignContent: "center",
-            backgroundColor: "blue",
-          }}
-          primary={props.item.name}
-        /> */}
-            {/* {console.log(props.item.products)} */}
-            {props.item.products.map((item) => (
-              <Item key={item.id} item={item} data={props.data} />
-            ))}
-          </List>
-        </List>
-      </div>
+        }}
+      >
+        {props.item.products.map((item) => (
+          <Item key={item.id} item={item} data={props.data} />
+        ))}
+      </List>
     </div>
   );
 }

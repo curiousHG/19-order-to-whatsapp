@@ -15,13 +15,10 @@ export default class SidebarLink extends Component {
           justifyContent: "center",
         }}
       >
-        {/* <h2>{this.props.text}</h2> */}
         <Button
-          // variant="contained"
-          // color="primary"
           onClick={() => {
             document.getElementById(this.props.text).scrollIntoView({
-              behavior: "smooth",
+              behavior: "smooth"
             });
           }}
           style={{

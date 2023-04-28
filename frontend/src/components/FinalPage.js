@@ -78,8 +78,8 @@ export default class FinalPage extends Component {
   render() {
     return (
       <div>
-        <Box textAlign="center" boxShadow={3} margin={2}>
-          <Typography variant="h2" color={"black"}>
+        <Box textAlign="center">
+          <Typography variant="h2" color={"black"} fontWeight="bold">
             Order Summary
           </Typography>
         </Box>
@@ -102,23 +102,9 @@ export default class FinalPage extends Component {
               </TableRow>
             </TableHead>
             <TableBody>
-              {/* <TableRow>
-                <TableCell
-                  align="center"
-                  style={{fontSize: "1.5rem" }}
-                >
-                  Bedmi Puri Atta
-                </TableCell>
-                <TableCell
-                  align="center"
-                  style={{fontSize: "1.5rem" }}
-                >
-                  400 gm
-                </TableCell>
-              </TableRow> */}
               {Object.keys(this.state.order).map((key) => {
                 return (
-                  <TableRow>
+                  <TableRow key={key}>
                     <TableCell align="center" style={{ fontSize: "1.5rem" }}>
                       {key}
                     </TableCell>
@@ -156,8 +142,10 @@ export default class FinalPage extends Component {
         />
         <br />
           <Button variant="contained" color="green" onClick={this.redirect.bind(this)}>
-            <WhatsAppIcon />
-            <Typography variant="h6"> Send to Whatsapp</Typography>
+            <WhatsAppIcon  style={{ fontSize: 30 }} />
+            <Typography variant="h5">
+              Send to Whatsapp
+            </Typography>
           </Button>
         </Box>
         
