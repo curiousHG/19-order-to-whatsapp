@@ -8,23 +8,24 @@ import TextField from "@mui/material/TextField";
 
 const Bill = () => {
     const SearchBar = ({ setSearchQuery }) => (
-        <form>
-            <TextField
-                id="search-bar"
-                className="text"
-                onInput={(e) => {
-                    setSearchQuery(e.target.value);
-                }}
-                label="Enter a city name"
-                variant="outlined"
-                placeholder="Search..."
-                size="small"
-            />
-            <IconButton type="submit" aria-label="search">
-                <SearchIcon style={{ fill: "blue" }} />
-            </IconButton>
-        </form>
-    );
+    <form>
+        <TextField
+            id="search-bar"
+            className="text"
+            onInput={(e) => {
+                setSearchQuery(e.target.value);
+            }}
+            label="Enter a city name"
+            variant="outlined"
+            placeholder="Search..."
+            size="small"
+            value={searchQuery}
+        />
+        <IconButton type="submit" aria-label="search">
+            <SearchIcon style={{ fill: "blue" }} />
+        </IconButton>
+    </form>
+);
     const data = [
         "Paris",
         "London",
@@ -38,6 +39,7 @@ const Bill = () => {
         "Dublin"
     ];
     const filterData = (query, data) => {
+        e.preventDefault();
         if (!query) {
             return data;
         } else {
