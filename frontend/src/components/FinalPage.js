@@ -44,7 +44,7 @@ export default class FinalPage extends Component {
       // pathname: pathname,
     });
   }
-  // redirec to whatsapp
+  // redirect to whatsapp
   redirect() {
     var pathname = "http://wa.me/919811572962?text=Hello!%0AI%20want%20to%20order%20the%20following%20items%20from%20your%20store%0A%0A";
     var name = this.state.name;

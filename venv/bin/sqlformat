@@ -1,4 +1,6 @@
-#!/Users/harshit/VSCode/WebDevelopment/ecommerce/venv/bin/python3.7
+#!/bin/sh
+'''exec' "/Users/harshitgupta/VS Code/ecommerce/venv/bin/python3.11" "$0" "$@"
+' '''
 # -*- coding: utf-8 -*-
 import re
 import sys

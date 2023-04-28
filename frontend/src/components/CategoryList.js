@@ -32,20 +32,20 @@ export default function CategoryList(props) {
           }
         }
       >
-        <Typography align="center" variant = "h3">{props.item.name}</Typography>
+        <Typography align="center" variant="h3">{props.item.name}</Typography>
       </Box>
-      <div class = "list">
-      <List
-        style={{
-          width: "100%",
-          // backgroundColor: "#f5f5f5",
-          padding: "2px",
-          // borderRadius: "1px",
-        }}
-        component="nav"
-        aria-labelledby="nested-list-subheader"
-      >
-        {/* <ListItemButton onClick={handleClick}>
+      <div class="list">
+        <List
+          style={{
+            width: "100%",
+            // backgroundColor: "#f5f5f5",
+            padding: "2px",
+            // borderRadius: "1px",
+          }}
+          component="nav"
+          aria-labelledby="nested-list-subheader"
+        >
+          {/* <ListItemButton onClick={handleClick}>
         <ListItemIcon>
           <InboxIcon />
         </ListItemIcon>
@@ -60,10 +60,10 @@ export default function CategoryList(props) {
         {open ? <ExpandLess /> : <ExpandMore />}
       </ListItemButton> */}
 
-        {/* <Collapse in={open} timeout="auto" unmountOnExit> */}
-        
-        <List component="div" disablePadding>
-          {/* <ListItemText
+          {/* <Collapse in={open} timeout="auto" unmountOnExit> */}
+
+          <List component="div" disablePadding>
+            {/* <ListItemText
           sx={{
             fontSize: "2rem",
             fontWeight: "bold",
@@ -73,12 +73,12 @@ export default function CategoryList(props) {
           }}
           primary={props.item.name}
         /> */}
-          {/* {console.log(props.item.products)} */}
-          {props.item.products.map((item) => (
-            <Item key={item.id} item={item} data={props.data} />
-          ))}
+            {/* {console.log(props.item.products)} */}
+            {props.item.products.map((item) => (
+              <Item key={item.id} item={item} data={props.data} />
+            ))}
+          </List>
         </List>
-      </List>
       </div>
     </div>
   );
