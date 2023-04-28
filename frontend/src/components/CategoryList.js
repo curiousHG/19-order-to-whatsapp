@@ -25,8 +25,9 @@ export default function CategoryList(props) {
         style={
           {
             backgroundColor: "darkred",
-            borderRadius: "10px",
-            margin: "10px",
+            borderTopLeftRadius: "10px",
+            borderTopRightRadius: "10px",
+            // margin: "10px",
             padding: "10px",
             color: "white",
           }

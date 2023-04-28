@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import { ListItem } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import { CardMedia } from "@mui/material";
 import { Box, Typography } from "@material-ui/core";
@@ -18,7 +19,7 @@ export default class Item extends Component {
   };
   render() {
     return (
-      <ListItemButton sx={{ pl: 2 }}>
+      <ListItem sx={{ pl: 2 }}>
         {/* <ListItemIcon sx={{ textAlign: "right" }}>
           <img src={this.props.item.image} width="100" height="60" />
         </ListItemIcon> */}
@@ -37,13 +38,14 @@ export default class Item extends Component {
             height: "10%",
             margin: "0 auto",
             backgroundColor: "white",
+            minWidth: "40px",
             
           }}
         />
         <Typography variant="h4" style={{ color: "white", padding: "0 2px", marginLeft:"1px" }}>
           {this.props.item.unit}
         </Typography>
-      </ListItemButton>
+      </ListItem>
     );
   }
 }

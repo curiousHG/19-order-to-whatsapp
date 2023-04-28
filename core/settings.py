@@ -94,6 +94,8 @@ TEMPLATES = [
     },
 ]
 
+CSRF_TRUSTED_ORIGINS = ['https://19onlineshop.com', 'https://www.19onlineshop.com', 'http://localhost:3000']
+
 WSGI_APPLICATION = "core.wsgi.application"
 
 

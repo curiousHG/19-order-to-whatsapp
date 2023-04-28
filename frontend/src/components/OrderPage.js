@@ -50,8 +50,9 @@ export default class OrderPage extends Component {
 
   render() {
     return (
-      <>
-        <Grid container spacing={1}>
+      <div style={{ width: "100%", overflowX: "hidden" }}>
+       {/* Hello */}
+        <Grid container spacing={1} style = {{width:"100%"}}>
           <Grid item xs={4}>
             <Card>
               <CardMedia
@@ -91,7 +92,7 @@ export default class OrderPage extends Component {
             </Box>
           </Grid>
           <Grid item xs={8}>
-            <div style={{ maxHeight: "100vh", overflowY: "auto" }}>
+            <div style={{ maxHeight: "100vh", overflowX: "hidden" }}>
               {this.state.details.map((item) => (
                 <CategoryList
                   key={item.id}
@@ -104,7 +105,7 @@ export default class OrderPage extends Component {
             </div>
           </Grid>
         </Grid>
-      </>
+      </div>
     );
   }
 }
