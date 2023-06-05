@@ -16,3 +16,4 @@ requirement.txt
 csv_data_add.py
 .env
 staticfiles_issue.txt
+.DS_Store
