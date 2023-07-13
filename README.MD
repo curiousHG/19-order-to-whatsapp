@@ -15,5 +15,3 @@ npm install
 npm run dev
 ```
 
-## Before Deployment
-
