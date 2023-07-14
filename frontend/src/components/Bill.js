@@ -3,109 +3,127 @@ import axios from "axios";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
 import TextField from "@mui/material/TextField";
+import { Autocomplete } from "@mui/material";
+import { Box } from "@mui/system";
+import { Button } from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+import {Delete} from "@mui/icons-material";
 
 
 
 const Bill = () => {
-    const SearchBar = ({ setSearchQuery }) => (
-    <form>
-        <TextField
-            id="search-bar"
-            className="text"
-            onInput={(e) => {
-                setSearchQuery(e.target.value);
-            }}
-            label="Enter a city name"
-            variant="outlined"
-            placeholder="Search..."
-            size="small"
-            value={searchQuery}
-        />
-        <IconButton type="submit" aria-label="search">
-            <SearchIcon style={{ fill: "blue" }} />
-        </IconButton>
-    </form>
-);
-    const data = [
-        "Paris",
-        "London",
-        "New York",
-        "Tokyo",
-        "Berlin",
-        "Buenos Aires",
-        "Cairo",
-        "Canberra",
-        "Rio de Janeiro",
-        "Dublin"
-    ];
-    const filterData = (query, data) => {
-        e.preventDefault();
-        if (!query) {
-            return data;
-        } else {
-            return data.filter((d) => d.toLowerCase().includes(query));
-        }
-    };
-
-    // get prices
-    // const [data, setData] = useState([]);
-    const [searchQuery, setSearchQuery] = useState("");
-    const dataFiltered = filterData(searchQuery, data);
+    const [data, setData] = useState([]);
+    const [order, setOrder] = useState({});
+    const [selected, setSelected] = useState("");
+    const [price, setPrice] = useState(0);
+    conse [quantity, setQuantity] = useState(1);
 
     // run once
-    // useEffect(() => {
-    //     axios.get("/store/category").then((res) => {
-    //         setData(res.data);
-    //         console.log(res.data);
-    //     }).catch((err) => {
-    //         console.log(err);
+    useEffect(() => {
+        axios.get("/store/products").then((res) => {
+            setData(res.data);
+            // console.log(res.data);
+        }).catch((err) => {
+            console.log(err);
 
-    //     });
-    // }, []);
+        });
+    }, []);
+
+    useEffect(() => {
+        console.log(order);
+    }, [len(order)]);
+
+    const handleSelect = (e) => {
+        // console.log(e.target.value);
+        e.preventDefault();
+        setSelected(e.target.value);
+        setPrice(data.find((item) => item.name === e.target.value).price);
+
+    };
+
+    const handleAdd = (e) => {
+        e.preventDefault();
+        const newOrder = { ...order };
+        if (newOrder[selected]) {
+            newOrder[selected] += 1;
+        } else {
+            newOrder[selected] = 1;
+        }
+        setOrder(newOrder);
+    };
+
+
+    // get prices
+
 
     return (
-        <>
+        <div style={{
+            margin: "5px",
+            padding: "5px",
+        }}>
             <h1>Bill</h1>
-            {/* <div
-                style={{
-                    display: "flex",
-                    alignSelf: "center",
-                    justifyContent: "center",
-                    flexDirection: "column",
-                    padding: 20
-                }}
-            >
-                <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-                <div style={{ padding: 3 }}>
-                    {dataFiltered.map((d) => (
-                        <div
-                            className="text"
-                            style={{
-                                padding: 5,
-                                justifyContent: "normal",
-                                fontSize: 20,
-                                color: "blue",
-                                margin: 1,
-                                width: "250px",
-                                BorderColor: "green",
-                                borderWidth: "10px"
-                            }}
-                            key={d.id}
-                        >
-                            {d}
-                        </div>
-                    ))}
-                </div>
-            </div> */}
-            {/* {data.map((item) => (
-                <div>
-                    <h1>{item.name}</h1>
-                    {item.products.map((p) => (
-                        <h2>{p.name} <span>{p.price}</span>  </h2>
-                    ))}
-                </div>
-            ))} */}
-        </>
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Autocomplete
+                    id="free-solo-demo"
+                    freeSolo
+                    options={data.map((option) => option.name)}
+                    renderInput={(params) => <TextField {...params} label="Search" margin="normal" variant="outlined" />}
+                    sx={{ width: 300 }}
+                />
+                <TextField
+                    id="outlined-basic"
+                    label="Quantity"
+                    variant="outlined"
+                    type="number"
+                    InputProps={{ inputProps: { min: 1 } }}
+                />
+                <Button variant="contained" sx={{ marginLeft: "10px" }}>
+                    Add
+                </Button>
+            </Box>
+            <Box>
+                <TableContainer component={Paper}>
+                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Product Name</TableCell>
+                                <TableCell align="right">Price</TableCell>
+                                <TableCell align="right">Quantity</TableCell>
+                                <TableCell align="right">Total</TableCell>
+                                <TableCell align="right">Delete</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {Object.keys(order).map((key) => (
+                                <TableRow
+                                    key={key}
+                                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                                >
+                                    <TableCell component="th" scope="row">
+                                        {key}
+                                    </TableCell>
+                                    {/* keep all cells editable */}
+                                    <TableCell align="right">{data.find((item) => item.name === key).price}</TableCell>
+                                    <TableCell align="right">{order[key]}</TableCell>
+                                    <TableCell align="right">{data.find((item) => item.name === key).price * order[key]}</TableCell>
+                                    <TableCell align="right">
+                                        <IconButton aria-label="delete" onClick={() => {
+                                            const newOrder = { ...order };
+                                            delete newOrder[key];
+                                            setOrder(newOrder);
+                                        }}>
+                                            <Delete />
+                                        </IconButton>
+                                    </TableCell>
+
+
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Box>
+        </div>
     )
 };
 
