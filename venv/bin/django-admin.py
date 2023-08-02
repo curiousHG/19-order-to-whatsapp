@@ -1,4 +1,4 @@
-#!/Users/harshit/VSCode/WebDevelopment/ecommerce/venv/bin/python3.7
+#!/Users/harshit/VS-Code/19-order-to-whatsapp/venv/bin/python3.11
 # When the django-admin.py deprecation ends, remove this script.
 import warnings
 
