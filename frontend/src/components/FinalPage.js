@@ -46,16 +46,16 @@ export default class FinalPage extends Component {
   }
   // redirect to whatsapp
   redirect() {
-    var pathname = "http://wa.me/919811572962?text=Hello!%0AI%20want%20to%20order%20the%20following%20items%20from%20your%20store%0A%0A";
-    var name = this.state.name;
-    var address = this.state.address;
-    var heading = "Item%20Quantity%0A";
+    let pathname = "http://wa.me/919811572962?text=Hello!%0AI%20want%20to%20order%20the%20following%20items%20from%20your%20store%0A%0A";
+    let name = this.state.name;
+    let address = this.state.address;
     pathname += "Name:%20" + name + "%0A";
     pathname += "Address:%20" + address + "%0A%0A";
+    // let heading = "Item%20Quantity%0A";
     // pathname += heading;
     for (let key in this.state.order) {
       // Chai%20Patti%2020Kg
-      pathname += key + "%20" + this.state.order[key] + "%0A";
+      if(this.state.order[key] !==null)pathname += key + "%20" + this.state.order[key] + "%0A";
     }
     pathname += "%0A%0AThank%20you!";
     // console.log(pathname);
