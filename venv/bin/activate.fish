@@ -33,7 +33,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/Users/harshitgupta/VS-Code/ecommerce/venv"
+set -gx VIRTUAL_ENV "/Users/harshit/VS-Code/ecommerce/venv"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH
