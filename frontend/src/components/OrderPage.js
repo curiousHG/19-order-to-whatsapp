@@ -42,16 +42,34 @@ export default class OrderPage extends Component {
       .catch((err) => {
         console.log(err);
       });
+    // let preDataLoad = true;
+    // if (localStorage.getItem("time")) {
+      // console.log(localStorage.getItem("time"));
+      // const time = new Date(localStorage.getItem("time"));
+      // console.log(time);
+      // const now = new Date();
+      // const diff = now - time;
+      // console.log(time, now, diff);
+      // if (diff > 1000 * 60 * 60 * 2) {
+      //   preDataLoad = false;
+      // }
+    // }
+    // if (localStorage.getItem("order") && preDataLoad) {
+    //   this.setState({
+    //     filled_data: this.useLocalStorage("order"),
+    //   });
+    // }
   }
   // Post the data to the server
   sendData() {
+    // const now = new Date();
     this.useLocalStorage("order", this.state.filled_data);
+    // this.useLocalStorage("time", now);
   }
 
   render() {
     return (
-      <div style={{ width: "100%", overflowX: "hidden" }}>
-       {/* Hello */}
+      <div style={{overflowX: "hidden", padding:"5px" }}>
         <Grid container spacing={1}>
           <Grid item xs={4}>
             <Card>
@@ -60,13 +78,11 @@ export default class OrderPage extends Component {
                 image={logo}
                 title="Logo"
                 sx={{
-                  width: "100%",
-                  height: "100%",
                   backgroundSize: "contain",
                   backgroundRepeat: "no-repeat",
                   backgroundPosition: "center",
                   margin: "0 auto",
-                  borderRadius: "10px",
+                  borderRadius: "2px",
                   shadow: "2px 2px 5px #000000",
                 }}
               />

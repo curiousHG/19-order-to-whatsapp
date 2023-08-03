@@ -6,9 +6,7 @@ import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 
 export default class Sidebar extends Component {
-  constructor(props) {
-    super(props);
-  }
+  
   render() {
     return (
       <div>

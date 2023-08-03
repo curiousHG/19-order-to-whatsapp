@@ -141,7 +141,7 @@ export default class FinalPage extends Component {
           onChange={this.onChangeAddress}
         />
         <br />
-          <Button variant="contained" color="green" onClick={this.redirect.bind(this)}>
+          <Button variant="contained" color="primary" onClick={this.redirect.bind(this)}>
             <WhatsAppIcon  style={{ fontSize: 30 }} />
             <Typography variant="h5">
               Send to Whatsapp
