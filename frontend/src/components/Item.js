@@ -66,6 +66,7 @@ export default class Item extends Component {
               margin: "0 auto",
               backgroundColor: "transparent",
               color: "white",
+              fontSize: "2.5rem",
               
             }}
           >
