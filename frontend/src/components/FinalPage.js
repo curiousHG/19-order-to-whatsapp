@@ -21,6 +21,7 @@ export default class FinalPage extends Component {
   state = {
     order: {},
     pathname: "http://wa.me/919811572962?",
+    submit: false,
   };
   useLocalStorage(key, value) {
     if (value) {
@@ -141,8 +142,8 @@ export default class FinalPage extends Component {
           onChange={this.onChangeAddress}
         />
         <br />
-          <Button variant="contained" color="primary" onClick={this.redirect.bind(this)}>
-            <WhatsAppIcon  style={{ fontSize: 30 }} />
+          <Button variant="contained" onClick={this.redirect.bind(this)} color="primary" >
+            <WhatsAppIcon  style={{ fontSize: 30, paddingRight: "0.5rem" }} />
             <Typography variant="h5">
               Send to Whatsapp
             </Typography>

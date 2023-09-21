@@ -70,7 +70,7 @@ export default class Item extends Component {
             }}
           >
             <MenuItem value={"KG"}>Kg</MenuItem>
-            <MenuItem value={"GM"}>GM</MenuItem>
+            <MenuItem value={"gm"}>gm</MenuItem>
             <MenuItem value={"PACKET"}>Pc</MenuItem>
           </Select>
       </ListItem>
