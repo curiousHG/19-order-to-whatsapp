@@ -1,21 +1,33 @@
 import React, { Component } from "react";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import { ListItem } from "@mui/material";
-import TextField from "@mui/material/TextField";
-import { CardMedia } from "@mui/material";
+import { ListItem, ListItemText, TextField, Select, MenuItem, CardMedia } from "@mui/material";
 import { Box, Typography } from "@material-ui/core";
 
 // import { TextField, InputField, TextBox } from "@material-ui/core";
 
 export default class Item extends Component {
-  constructor(props) {
-    super(props);
-  }
+
+  // define state
+  state = {
+    quantity: "",
+    unit: "KG",
+  };
+
+
   onChange = (e) => {
-    this.props.data[this.props.item.name] = e.target.value;
-    this.props.data[this.props.item.name] += this.props.item.unit;
+
+    this.setState({
+      quantity: e.target.value,
+    });
+    this.props.data[this.props.item.name] = e.target.value + " " + this.state.unit;
+  };
+  changeUnit = (e) => {
+    this.setState({
+      unit: e.target.value,
+    });
+    // trim the unit from the string
+    this.props.data[this.props.item.name] = this.state.quantity + " " + e.target.value;
   };
   render() {
     return (
@@ -29,7 +41,7 @@ export default class Item extends Component {
           style={{ textAlign: "left", color: "white" }}
         />
         <TextField
-          value={this.props.data[this.props.item.name]}
+          value={this.state.quantity}
           onChange={this.onChange}
           inputProps={{ style: { textAlign: "center", fontSize: "2.5rem" } }}
           variant="outlined"
@@ -39,12 +51,28 @@ export default class Item extends Component {
             margin: "0 auto",
             backgroundColor: "white",
             minWidth: "40px",
-            
+
           }}
         />
-        <Typography variant="h4" style={{ color: "white", padding: "0 2px", marginLeft:"1px" }}>
-          {this.props.item.unit}
-        </Typography>
+          {/* {this.props.item.unit} */}
+
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={this.state.unit}
+            label="Unit"
+            onChange={this.changeUnit}
+            sx={{
+              margin: "0 auto",
+              backgroundColor: "transparent",
+              color: "white",
+              
+            }}
+          >
+            <MenuItem value={"KG"}>Kg</MenuItem>
+            <MenuItem value={"GM"}>GM</MenuItem>
+            <MenuItem value={"PACKET"}>Pc</MenuItem>
+          </Select>
       </ListItem>
     );
   }

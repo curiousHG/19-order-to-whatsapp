@@ -60,9 +60,23 @@ export default class OrderPage extends Component {
     //   });
     // }
   }
+  removeEmptyItems = () => {
+    let data = this.state.filled_data;
+    for (let key in data) {
+      // if first character of value is not a number delete
+      if( data[key][0] < '0' || data[key][0] > '9'){
+        delete data[key];
+      }
+    }
+    this.setState({
+      filled_data: data,
+    });
+  }
   // Post the data to the server
   sendData() {
     // const now = new Date();
+    this.removeEmptyItems();
+    console.log(this.state.filled_data);
     this.useLocalStorage("order", this.state.filled_data);
     // this.useLocalStorage("time", now);
   }
