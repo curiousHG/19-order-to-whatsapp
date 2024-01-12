@@ -15,5 +15,7 @@ Makefile
 requirement.txt
 csv_data_add.py
 .env
+# any file with .env in beginning
+.env-new
 staticfiles_issue.txt
 .DS_Store

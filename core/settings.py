@@ -12,9 +12,17 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from django.conf import settings
 from pathlib import Path
 import os
-from dotenv import load_dotenv
-env = load_dotenv()
+from dotenv import load_dotenv, find_dotenv
+print(find_dotenv())
+env = load_dotenv(find_dotenv())
 
+# print the .env file
+
+
+
+# print all env variables
+# print load_dotenv() path from where env is loaded
+# print(os.getenv("DB_NAME"))
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
