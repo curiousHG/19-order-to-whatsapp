@@ -2,17 +2,12 @@ import React, {Component} from 'react';
 import {render} from 'react-dom';
 import HomePage from './HomePage';
 
-export default class App extends Component {
-    constructor(props) {
-        super(props);
-    }
-    render() {
-        return (
-            <main>
-                <HomePage />
-            </main>
-        )
-    }
+export default function App() {
+    return (
+        <main>
+            <HomePage />
+        </main>
+    );
 }
 
 const appDiv = document.getElementById('app');

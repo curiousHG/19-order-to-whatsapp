@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useEffect, useState } from "react";
 import { Typography, Button, Box, Grid } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import CategoryList from "./CategoryList";
@@ -7,19 +7,31 @@ import Sidebar from "./Sidebar";
 import logo from "./images/logo.jpg";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
+import { render } from "react-dom";
+import getProducts from "../api/getProducts";
 axios.defaults.xsrfHeaderName = "X-CSRFToken";
 axios.defaults.xsrfCookieName = "csrftoken";
 
-export default class OrderPage extends Component {
-  constructor(props) {
-    super(props);
-  }
-  state = {
-    details: [],
-    filled_data: {},
-    category_names: [],
-  };
-  useLocalStorage(key, value) {
+
+// rewrite OrderPage with function and latest react methods
+
+const OrderPage = () => {
+  const [details, setDetails] = useState([]);
+  const [filledData, setFilledData] = useState({});
+  const [categoryNames, setCategoryNames] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get("/store/category")
+      .then((res) => {
+        setDetails(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
+  const useLocalStorage = (key, value) => {
     if (value) {
       localStorage.setItem(key, JSON.stringify(value));
     } else {
@@ -28,114 +40,77 @@ export default class OrderPage extends Component {
     }
   }
 
-  componentDidMount() {
-    let data;
-    axios
-      .get("/store/category")
-      .then((res) => {
-        data = res.data;
-        // console.log(data);
-        this.setState({
-          details: data,
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    // let preDataLoad = true;
-    // if (localStorage.getItem("time")) {
-      // console.log(localStorage.getItem("time"));
-      // const time = new Date(localStorage.getItem("time"));
-      // console.log(time);
-      // const now = new Date();
-      // const diff = now - time;
-      // console.log(time, now, diff);
-      // if (diff > 1000 * 60 * 60 * 2) {
-      //   preDataLoad = false;
-      // }
-    // }
-    // if (localStorage.getItem("order") && preDataLoad) {
-    //   this.setState({
-    //     filled_data: this.useLocalStorage("order"),
-    //   });
-    // }
-  }
-  removeEmptyItems = () => {
-    let data = this.state.filled_data;
+  const removeEmptyItems = () => {
+    let data = filledData;
     for (let key in data) {
       // if first character of value is not a number delete
       if( data[key][0] < '0' || data[key][0] > '9'){
         delete data[key];
       }
     }
-    this.setState({
-      filled_data: data,
-    });
-  }
-  // Post the data to the server
-  sendData() {
-    // const now = new Date();
-    this.removeEmptyItems();
-    console.log(this.state.filled_data);
-    this.useLocalStorage("order", this.state.filled_data);
-    // this.useLocalStorage("time", now);
+    setFilledData(data);
   }
 
-  render() {
-    return (
-      <div style={{overflowX: "hidden", padding:"5px" }}>
-        <Grid container spacing={1}>
-          <Grid item xs={4}>
-            <Card>
-              <CardMedia
-                component="img"
-                image={logo}
-                title="Logo"
-                sx={{
-                  backgroundSize: "contain",
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "center",
-                  margin: "0 auto",
-                  borderRadius: "2px",
-                  shadow: "2px 2px 5px #000000",
-                }}
-              />
-            </Card>
+  const sendData = () => {
+    removeEmptyItems();
+    console.log(filledData);
+    useLocalStorage("order", filledData);
+  }
 
-            <Sidebar info={this.state.details} />
+  return (
+    <div style={{overflowX: "hidden", padding:"5px" }}>
+      <Grid container spacing={1}>
+        <Grid item xs={4}>
+          <Card>
+            <CardMedia
+              component="img"
+              image={logo}
+              title="Logo"
+              sx={{
+                backgroundSize: "contain",
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "center",
+                margin: "0 auto",
+                borderRadius: "2px",
+                shadow: "2px 2px 5px #000000",
+              }}
+            />
+          </Card>
 
-            <Box textAlign="center">
-              <Link
-                to={{ pathname: "/final", state: this.state.filled_data }}
-                style={{ textDecoration: "none" }}
+          <Sidebar info={details} />
+
+          <Box textAlign="center">
+            <Link
+              to={{ pathname: "/final", state: filledData }}
+              style={{ textDecoration: "none" }}
+            >
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={sendData}
               >
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => {
-                    this.sendData();
-                  }}
-                >
-                  <Typography variant="h3">Confirm Order</Typography>
-                </Button>
-              </Link>
-            </Box>
-          </Grid>
-          <Grid item xs={8}>
-            <div style={{ maxHeight: "100vh", overflowX: "hidden" }}>
-              {this.state.details.map((item) => (
-                <CategoryList
-                  key={item.id}
-                  item={item}
-                  data={this.state.filled_data}
-                  padding={2}
-                  style={{ color: "blue" }}
-                />
-              ))}
-            </div>
-          </Grid>
+                <Typography variant="h3">Confirm Order</Typography>
+              </Button>
+            </Link>
+          </Box>
         </Grid>
-      </div>
-    );
-  }
+        <Grid item xs={8}>
+          <div style={{ maxHeight: "100vh", overflowX: "hidden" }}>
+            {details.map((item) => (
+              <CategoryList
+                key={item.id}
+                item={item}
+                data={filledData}
+                padding={2}
+                style={{ color: "blue" }}
+              />
+            ))}
+          </div>
+        </Grid>
+      </Grid>
+    </div>
+  );
+
 }
+ 
+export default OrderPage;

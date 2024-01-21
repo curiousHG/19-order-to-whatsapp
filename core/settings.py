@@ -13,16 +13,7 @@ from django.conf import settings
 from pathlib import Path
 import os
 from dotenv import load_dotenv, find_dotenv
-print(find_dotenv())
-env = load_dotenv(find_dotenv())
-
-# print the .env file
-
-
-
-# print all env variables
-# print load_dotenv() path from where env is loaded
-# print(os.getenv("DB_NAME"))
+env = load_dotenv(find_dotenv(), override=True)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,8 +29,8 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
-DEBUG = os.getenv("DEBUG")
-DEBUG = DEBUG == "True"
+DEBUG_VAL = os.getenv("DEBUG")
+DEBUG = DEBUG_VAL == "True"
 # print(type(DEBUG))
 
 ALLOWED_HOSTS = [
