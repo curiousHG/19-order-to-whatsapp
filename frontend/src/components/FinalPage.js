@@ -57,7 +57,7 @@ export default function FinalPage() {
 
         const resp_order = await postOrder({ customer: {name: name, address: address}, products: order});
 
-        if (resp_cust.status === 200 && resp_order.status === 200) {
+        if (resp_order.status === 200) {
             setSubmit(true);
             window.location.href = pathname;
         }
