@@ -57,7 +57,6 @@ const Bill = () => {
         alert("Item already added");
       }
     }
-    console.log(item);
   };
 
 
@@ -146,7 +145,6 @@ const Bill = () => {
             </TableHead>
             <TableBody>
               {order.length > 0 && order.map((item, key) => {
-                console.log(key);
                 return (
                   <TableRow
                     key={item.id}

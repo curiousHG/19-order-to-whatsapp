@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState } from "react";
+import React, { Component, useEffect, useState, Suspense } from "react";
 import { Typography, Button, Box, Grid } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import CategoryList from "./CategoryList";
@@ -21,10 +21,9 @@ const OrderPage = () => {
   const [categoryNames, setCategoryNames] = useState([]);
 
   useEffect(() => {
-    axios
-      .get("/store/category")
+    getProducts()
       .then((res) => {
-        setDetails(res.data);
+        setDetails(res);
       })
       .catch((err) => {
         console.log(err);
@@ -44,7 +43,7 @@ const OrderPage = () => {
     let data = filledData;
     for (let key in data) {
       // if first character of value is not a number delete
-      if( data[key][0] < '0' || data[key][0] > '9'){
+      if (data[key][0] < '0' || data[key][0] > '9') {
         delete data[key];
       }
     }
@@ -57,8 +56,9 @@ const OrderPage = () => {
     useLocalStorage("order", filledData);
   }
 
+
   return (
-    <div style={{overflowX: "hidden", padding:"5px" }}>
+    <div style={{ overflowX: "hidden", padding: "5px" }}>
       <Grid container spacing={1}>
         <Grid item xs={4}>
           <Card>
@@ -97,6 +97,7 @@ const OrderPage = () => {
         <Grid item xs={8}>
           <div style={{ maxHeight: "100vh", overflowX: "hidden" }}>
             {details.map((item) => (
+
               <CategoryList
                 key={item.id}
                 item={item}
@@ -112,5 +113,5 @@ const OrderPage = () => {
   );
 
 }
- 
+
 export default OrderPage;

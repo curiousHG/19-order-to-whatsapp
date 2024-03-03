@@ -61,16 +61,15 @@ class OrderSerializer(serializers.ModelSerializer):
 
         # everytime create a new customer 
         user = Customer.objects.create(**customer)
-        
-
-
-        # customer = Customer.objects.create(**customer)
-        # ValueError: Cannot assign "<Customer: Harshit>": "Order.customer" must be a "User" instance.
         order = Order.objects.create(customer=user)
-
+        products_list = []
         for product_data in products:
             product_name = product_data['product']
             product_quantity = product_data['quantity']
+            item = {"product": product_name, "quantity": product_quantity}
+            products_list.append(item)
             product_obj = Product.objects.get(name=product_name)
             OrderItem.objects.create(order=order, product=product_obj, quantity=product_quantity)
+        order.products = products_list
+        order.save()
         return order

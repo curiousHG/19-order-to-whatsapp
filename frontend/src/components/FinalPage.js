@@ -55,9 +55,9 @@ export default function FinalPage() {
         }
         console.log(restructered_order);
 
-        const resp_order = await postOrder({ customer: {name: name, address: address}, products: order});
+        const resp_order = await postOrder({ customer: {name: name, address: address}, products: restructered_order});
 
-        if (resp_cust.status === 200 && resp_order.status === 200) {
+        if (resp_order.status === 200) {
             setSubmit(true);
             window.location.href = pathname;
         }
