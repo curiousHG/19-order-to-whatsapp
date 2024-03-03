@@ -53,14 +53,18 @@ export default function FinalPage() {
         for (let key in order) {
             if (order[key] !== null) restructered_order.push({ product: key, quantity: order[key] });
         }
-        console.log(restructered_order);
+        // console.log(restructered_order);
 
-        const resp_order = await postOrder({ customer: {name: name, address: address}, products: restructered_order});
-
-        if (resp_order.status === 200) {
-            setSubmit(true);
-            window.location.href = pathname;
-        }
+        const resp_order = await postOrder({ customer: {name: name, address: address}, products: restructered_order})
+            .then(status => {
+                if (status === 201) {
+                    setSubmit(true);
+                    window.location.href = pathname;
+                }
+            })
+            .catch(err => {
+                console.log(err);
+            });
 
 
     }
