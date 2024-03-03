@@ -1,10 +1,10 @@
-import * as React from "react";
+import React, { useState } from "react";
 import List from "@mui/material/List";
 const Item = React.lazy(() => import("./Item"));
 import { Box, Typography } from "@material-ui/core";
 
 export default function CategoryList(props) {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   const handleClick = () => {
     setOpen(!open);

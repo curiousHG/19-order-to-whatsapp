@@ -2,7 +2,7 @@
 
 /*! ./CategoryList */
 
-/*! ./Item */
+/*! ./Loading */
 
 /*! ./Sidebar */
 
@@ -17,8 +17,6 @@
 /*! @mui/material/Card */
 
 /*! @mui/material/CardMedia */
-
-/*! @mui/material/List */
 
 /*! axios */
 
@@ -45,10 +43,6 @@
 /*!***************************************!*\
   !*** ./src/components/SidebarLink.js ***!
   \***************************************/
-
-/*!****************************************!*\
-  !*** ./src/components/CategoryList.js ***!
-  \****************************************/
 
 /*!****************************************!*\
   !*** ./src/components/images/logo.jpg ***!

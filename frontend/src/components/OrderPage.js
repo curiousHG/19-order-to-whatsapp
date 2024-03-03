@@ -1,7 +1,8 @@
-import React, { Component, useEffect, useState, Suspense } from "react";
+import React, { Component, useEffect, useState, Suspense, lazy } from "react";
 import { Typography, Button, Box, Grid } from "@material-ui/core";
 import { Link } from "react-router-dom";
-import CategoryList from "./CategoryList";
+// import CategoryList from "./CategoryList";
+const LazyCategoryList = lazy(() => import("./CategoryList"));
 import axios from "axios";
 import Sidebar from "./Sidebar";
 import logo from "./images/logo.jpg";
@@ -9,6 +10,7 @@ import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import { render } from "react-dom";
 import getAllProducts from "../api/getCategory";
+import MyLoader from "./Loading";
 axios.defaults.xsrfHeaderName = "X-CSRFToken";
 axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -19,6 +21,8 @@ const OrderPage = () => {
   const [details, setDetails] = useState([]);
   const [filledData, setFilledData] = useState({});
   const [categoryNames, setCategoryNames] = useState([]);
+
+  // how to get component render time
 
   useEffect(() => {
     getAllProducts()
@@ -56,7 +60,9 @@ const OrderPage = () => {
     useLocalStorage("order", filledData);
   }
 
-
+  if (details.length === 0) {
+    return <MyLoader />;
+  }
   return (
     <div style={{ overflowX: "hidden", padding: "5px" }}>
       <Grid container spacing={1}>
@@ -97,8 +103,7 @@ const OrderPage = () => {
         <Grid item xs={8}>
           <div style={{ maxHeight: "100vh", overflowX: "hidden" }}>
             {details.map((item) => (
-
-              <CategoryList
+              <LazyCategoryList
                 key={item.id}
                 item={item}
                 data={filledData}
@@ -111,7 +116,7 @@ const OrderPage = () => {
       </Grid>
     </div>
   );
-
+  
 }
 
 export default OrderPage;

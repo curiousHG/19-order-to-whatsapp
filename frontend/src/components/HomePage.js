@@ -5,6 +5,7 @@ const FinalPage = lazy(() => import("./FinalPage"));
 const Bill = lazy(() => import("./Bill"));
 import { BrowserRouter as Router, Route, Link, Routes, Redirect } from "react-router-dom";
 
+import MyLoader from "./Loading";
 // import ResponsiveAppBar from "./OrderPage2";
 
 // switch from class to function
@@ -12,11 +13,11 @@ import { BrowserRouter as Router, Route, Link, Routes, Redirect } from "react-ro
 export default function HomePage() {
     return (
         <Router>
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<MyLoader />}>
                 <Routes>
                     <Route path="/" element={<OrderPage />} />
                     <Route exact path="/final" element={<FinalPage />} />
-                    {/* <Route exact path="/home" element={<ResponsiveAppBar />} /> */}
+                    {/* <Route exact path="/test" element={<MyLoader />} /> */}
                     <Route exact path="/price" element={<Bill />} />
                 </Routes>
             </Suspense>
