@@ -29,7 +29,7 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'customer', 'order_date']
+    list_display = ['id', 'customer', 'order_date', 'products']
     list_filter = ['order_date']
     search_fields = ['id', 'customer__username']
     inlines = [OrderItemInline]
@@ -42,7 +42,7 @@ class OrderAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super(OrderAdmin, self).get_queryset(request)
-        return qs.prefetch_related('products')
+        return qs
 
     def total(self, obj):
         return obj.get_total()
