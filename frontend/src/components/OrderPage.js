@@ -8,7 +8,7 @@ import logo from "./images/logo.jpg";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import { render } from "react-dom";
-import getProducts from "../api/getProducts";
+import getAllProducts from "../api/getCategory";
 axios.defaults.xsrfHeaderName = "X-CSRFToken";
 axios.defaults.xsrfCookieName = "csrftoken";
 
@@ -21,9 +21,9 @@ const OrderPage = () => {
   const [categoryNames, setCategoryNames] = useState([]);
 
   useEffect(() => {
-    getProducts()
-      .then((res) => {
-        setDetails(res);
+    getAllProducts()
+      .then((data) => {
+        setDetails(data);
       })
       .catch((err) => {
         console.log(err);
