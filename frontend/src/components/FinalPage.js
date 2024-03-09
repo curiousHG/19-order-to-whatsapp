@@ -20,7 +20,7 @@ import postOrder from "../api/postOrder";
 export default function FinalPage() {
     const [order, setOrder] = useState({});
     const [pathname, setPathname] = useState("http://wa.me/919811572962?");
-    const [submit, setSubmit] = useState(false);
+    // const [submit, setSubmit] = useState(false);
     const [name, setName] = useState("");
     const [address, setAddress] = useState("");
 
@@ -37,35 +37,36 @@ export default function FinalPage() {
 
     // redirect to whatsapp
     async function redirect() {
+        // console.log("redirecting");
         let pathname = "http://wa.me/919811572962?text=Hello!%0AI%20want%20to%20order%20the%20following%20items%20from%20your%20store%0A%0A";
-        pathname += "Name:%20" + name + "%0A";
-        pathname += "Address:%20" + address + "%0A%0A";
+        const updatedName = name === "" ? "NoName" : name;
+        const updatedAddress = address === "" ? "NoAddress" : address;
+        // console.log(updatedName, updatedAddress);
+        pathname += "Name:%20" + updatedName + "%0A";
+        pathname += "Address:%20" + updatedAddress + "%0A%0A";
         for (let key in order) {
             // Chai%20Patti%2020Kg
             if (order[key] !== null) pathname += key + "%20" + order[key] + "%0A";
         }
         pathname += "%0A%0AThank%20you!";
         setPathname(pathname);
-        // const resp_cust = await postCustomer({ name: name, address: address});
-        // const resp_order = await postOrder(order);
 
         const restructered_order = [];
         for (let key in order) {
-            if (order[key] !== null) restructered_order.push({ product: key, quantity: order[key] });
+            if (order[key] !== null) restructered_order.push({ "product": key, "quantity": order[key] });
         }
-        // console.log(restructered_order);
+        const reqData = { "customer": { "name": updatedName, "address": updatedAddress }, "products": restructered_order };
+        // console.log(reqData);
 
-        const resp_order = await postOrder({ customer: {name: name, address: address}, products: restructered_order})
+        await postOrder(reqData)
             .then(status => {
-                if (status === 201) {
-                    setSubmit(true);
-                    window.location.href = pathname;
-                }
+                // console.log(status);
+                // window.location.href = pathname;
+                
             })
             .catch(err => {
                 console.log(err);
             });
-
 
     }
 

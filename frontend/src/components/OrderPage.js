@@ -56,7 +56,7 @@ const OrderPage = () => {
 
   const sendData = () => {
     removeEmptyItems();
-    console.log(filledData);
+    // console.log(filledData);
     useLocalStorage("order", filledData);
   }
 
