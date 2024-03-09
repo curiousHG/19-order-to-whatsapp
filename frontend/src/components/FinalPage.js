@@ -60,8 +60,7 @@ export default function FinalPage() {
 
         await postOrder(reqData)
             .then(status => {
-                // console.log(status);
-                // window.location.href = pathname;
+                window.location.href = pathname;
                 
             })
             .catch(err => {

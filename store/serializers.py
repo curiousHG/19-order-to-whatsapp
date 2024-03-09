@@ -47,7 +47,7 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = ('customer', 'products')
 
     def create(self, validated_data):
-        print(validated_data)
+        # print(validated_data)
         
         customer = validated_data.pop('customer')
         products = validated_data.pop('products')
