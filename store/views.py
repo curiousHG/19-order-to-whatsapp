@@ -62,7 +62,6 @@ class OrderView(generics.ListCreateAPIView):
     # create a post method to create a new order
     # print the request data
     def post(self, request, format=None):
-        print(request.data)
 
         serializer = OrderSerializer(data=request.data)
         if serializer.is_valid():
