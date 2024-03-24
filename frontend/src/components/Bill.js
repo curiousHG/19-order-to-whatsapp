@@ -4,8 +4,6 @@ import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
 import Delete from "@mui/icons-material/Delete";
 import Edit from "@mui/icons-material/Edit";
-import Checkbox from "@mui/material/Checkbox";
-import { DataGrid } from "@mui/x-data-grid";
 
 import {
   Autocomplete,
@@ -25,7 +23,6 @@ const Bill = () => {
   const [data, setData] = useState([]);
   const [order, setOrder] = useState([]);
   const [item, setItem] = useState({}); // {name: "", price: 0, quantity: 0, total: 0}
-  const [price, setPrice] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [total, setTotal] = useState(0);
 

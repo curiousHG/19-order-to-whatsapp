@@ -1,14 +1,12 @@
-import React, { Component, useEffect, useState, Suspense, lazy } from "react";
+import React, { useEffect, useState, lazy } from "react";
 import { Typography, Button, Box, Grid } from "@material-ui/core";
 import { Link } from "react-router-dom";
-// import CategoryList from "./CategoryList";
 const LazyCategoryList = lazy(() => import("./CategoryList"));
 import axios from "axios";
 import Sidebar from "./Sidebar";
 import logo from "./images/logo.jpg";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
-import { render } from "react-dom";
 import getAllProducts from "../api/getCategory";
 import MyLoader from "./Loading";
 axios.defaults.xsrfHeaderName = "X-CSRFToken";
@@ -116,7 +114,7 @@ const OrderPage = () => {
       </Grid>
     </div>
   );
-  
+
 }
 
 export default OrderPage;
