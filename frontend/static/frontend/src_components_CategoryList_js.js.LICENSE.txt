@@ -2,9 +2,9 @@
 
 /*! ../styles/useThemeProps */
 
-/*! ./Item */
-
 /*! ./ListContext */
+
+/*! ./NewItem */
 
 /*! ./listClasses */
 
@@ -14,9 +14,13 @@
 
 /*! @material-ui/core */
 
-/*! @mui/base */
-
 /*! @mui/material/List */
+
+/*! @mui/utils/composeClasses */
+
+/*! @mui/utils/generateUtilityClass */
+
+/*! @mui/utils/generateUtilityClasses */
 
 /*! clsx */
 

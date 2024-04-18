@@ -1,6 +1,7 @@
 html,
 body {
     /* width: 100%; */
+    /* background-color: #9AC698; */
     background-color: #e8e875;
     margin: 0;
     padding: 0;
@@ -15,6 +16,7 @@ body {
 }
 
 .link:hover {
+    /* background-color: #87A922;  */
     background-color: lightskyblue;
     color: black;
     transition: color 100ms ease-out;
@@ -42,8 +44,9 @@ body {
     padding: 10px 20px;
     margin: 10px 0 auto;
     margin-bottom: 10px;
-    box-shadow: 0 0 6px hsl(210 14% 90%);
+    box-shadow: 0 0 1px hsl(210 14% 90%);
     border-color: black;
+    /* background-color: #114232; */
     background-color: #f14d52;
 }
 

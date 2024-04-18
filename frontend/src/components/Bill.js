@@ -56,6 +56,12 @@ const Bill = () => {
     }
   };
 
+  const handlePrint = (e) => {
+    e.preventDefault();
+    // create a pdf
+
+  };
+
 
   // get prices
 
@@ -69,7 +75,7 @@ const Bill = () => {
       }}
     >
       <div style={{ display: "flex", justifyContent: "center" }}>
-        <Typography variant="h2">Bill</Typography>
+        <Typography variant="h4">Bill</Typography>
       </div>
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
         <Autocomplete
@@ -123,6 +129,9 @@ const Bill = () => {
           sx={{ marginLeft: "10px" }} onClick={handleAdd}>
           Add
         </Button>
+        <Button variant = "contained" sx={{ marginLeft: "10px" }}  onClick={handlePrint}>
+          Print
+        </Button>
       </Box>
       <Box>
         <TableContainer component={Paper}>
@@ -132,7 +141,7 @@ const Bill = () => {
           }} aria-label="simple table">
             <TableHead>
               <TableRow sx={{ backgroundColor: "#f9f9f9", border: "1px solid #ddd" }}>
-                <TableCell align="center">ID</TableCell>
+                {/* <TableCell align="center">ID</TableCell> */}
                 <TableCell>Product Name</TableCell>
                 <TableCell align="right">Price</TableCell>
                 <TableCell align="right">Quantity</TableCell>
@@ -147,9 +156,9 @@ const Bill = () => {
                     key={item.id}
                     sx={{ "&:last-child td, &:last-child th": { border: 1 } }}
                   >
-                    <TableCell padding="checkbox" align="center">
+                    {/* <TableCell padding="checkbox" align="center">
                       {key + 1}
-                    </TableCell>
+                    </TableCell> */}
 
                     <TableCell component="th" scope="row">
                       {item.name}

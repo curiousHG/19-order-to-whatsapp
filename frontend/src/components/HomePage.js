@@ -6,6 +6,7 @@ const Bill = lazy(() => import("./Bill"));
 import { BrowserRouter as Router, Route, Link, Routes, Redirect } from "react-router-dom";
 
 import MyLoader from "./Loading";
+import MyDocument from "./Document";
 // import ResponsiveAppBar from "./OrderPage2";
 
 // switch from class to function
@@ -17,7 +18,7 @@ export default function HomePage() {
                 <Routes>
                     <Route path="/" element={<OrderPage />} />
                     <Route exact path="/final" element={<FinalPage />} />
-                    {/* <Route exact path="/test" element={<MyLoader />} /> */}
+                    {/* <Route exact path="/test" element={<MyDocument />} /> */}
                     <Route exact path="/price" element={<Bill />} />
                 </Routes>
             </Suspense>
