@@ -27,7 +27,7 @@ class Product(models.Model):
     class QuantityDenomination(models.TextChoices):
         KG = "KG", "Kilogram"
         LTR = "LTR", "Liter"
-        GM = "GM", "Gram"
+        GM = "gm", "Gram"
         PC = "Pc", "Pc"
         # allow to add more choices
 
