@@ -26,14 +26,14 @@ const Item = ({ item, data }) => {
             setQuantity(quantity * 1000);
             setUnit("gm");
             data[item.name] = quantity*1000 + " " + "gm";
+        }else if(quantity > 99 && unit != "Pc"){
+                setQuantity(quantity);
+                setUnit("gm");
+                data[item.name] = quantity + " " + "gm";
         }else if (quantity >= 1 && unit != "Pc") {
             setQuantity(quantity);
             setUnit("KG");
             data[item.name] = quantity + " " + "KG";
-        }else if(quantity > 99 && unit != "Pc"){
-            setQuantity(quantity);
-            setUnit("gm");
-            data[item.name] = quantity + " " + "gm";
         }
     }
     return (
