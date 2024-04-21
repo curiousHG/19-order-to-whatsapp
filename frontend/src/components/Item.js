@@ -1,80 +1,77 @@
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import { ListItem, ListItemText, TextField, Select, MenuItem, CardMedia } from "@mui/material";
+import { ListItem, ListItemText, TextField, Select, MenuItem, CardMedia, Grid } from "@mui/material";
 import { Box, Typography } from "@material-ui/core";
 
 // import { TextField, InputField, TextBox } from "@material-ui/core";
 
-export default class Item extends Component {
+const Item = ({ item, data }) => {
 
-  // define state
-  state = {
-    quantity: "",
-    unit: "KG",
-  };
+    // define state
+    // console.log(data);
+    const [quantity, setQuantity] = useState("");
+    const [unit, setUnit] = useState(item.unit);
 
+    const onChange = (e) => {
+        setQuantity(e.target.value);
+        data[item.name] = e.target.value + " " + unit;
+    }
+    const onBlur = (e) => {
 
-  onChange = (e) => {
-
-    this.setState({
-      quantity: e.target.value,
-    });
-    this.props.data[this.props.item.name] = e.target.value + " " + this.state.unit;
-  };
-  changeUnit = (e) => {
-    this.setState({
-      unit: e.target.value,
-    });
-    // trim the unit from the string
-    this.props.data[this.props.item.name] = this.state.quantity + " " + e.target.value;
-  };
-  render() {
+        if(quantity==="" || quantity == 0){
+            setQuantity("");
+            delete data[item.name];
+        }else if (quantity < 1 && unit != "Pc") {
+            setQuantity(quantity * 1000);
+            setUnit("gm");
+            data[item.name] = quantity*1000 + " " + "gm";
+        }else if(quantity > 99 && unit != "Pc"){
+                setQuantity(quantity);
+                setUnit("gm");
+                data[item.name] = quantity + " " + "gm";
+        }else if (quantity >= 1 && unit != "Pc") {
+            setQuantity(quantity);
+            setUnit("KG");
+            data[item.name] = quantity + " " + "KG";
+        }
+    }
     return (
-      <ListItem sx={{ pl: 2 }}>
-        {/* <ListItemIcon sx={{ textAlign: "right" }}>
-          <img src={this.props.item.image} width="100" height="60" />
-        </ListItemIcon> */}
-        <ListItemText
-          primary={this.props.item.name}
-          primaryTypographyProps={{ fontSize: "2.5rem" }}
-          style={{ textAlign: "left", color: "white" }}
-        />
-        <TextField
-          value={this.state.quantity}
-          onChange={this.onChange}
-          inputProps={{ style: { textAlign: "center", fontSize: "2.5rem" } }}
-          variant="outlined"
-          sx={{
-            width: "20%",
-            height: "10%",
-            margin: "0 auto",
-            backgroundColor: "white",
-            minWidth: "40px",
+        <ListItem >
+            <Grid container alignItems="center" justifyContent="space-between">
+                {/* First Column */}
+                <Grid item xs={7}>
+                    <ListItemText
+                        primary={item.name}
+                        primaryTypographyProps={{ fontSize: "2.5rem" }}
+                        style={{ textAlign: "left", color: "white" }}
+                    />
+                </Grid>
 
-          }}
-        />
-          {/* {this.props.item.unit} */}
+                {/* Second Column */}
+                <Grid item xs={4}>
+                    <TextField
+                        value={quantity}
+                        onChange={onChange}
+                        onBlur={onBlur}
+                        inputProps={{ style: { textAlign: "center", fontSize: "2.5rem" } }}
+                        variant="outlined"
+                        fullWidth
+                        style={{ backgroundColor: "white" }}
+                    />
+                </Grid>
 
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={this.state.unit}
-            label="Unit"
-            onChange={this.changeUnit}
-            sx={{
-              margin: "0 auto",
-              backgroundColor: "transparent",
-              color: "white",
-              fontSize: "2.5rem",
-              
-            }}
-          >
-            <MenuItem value={"KG"}>Kg</MenuItem>
-            <MenuItem value={"gm"}>gm</MenuItem>
-            <MenuItem value={"PACKET"}>Pc</MenuItem>
-          </Select>
-      </ListItem>
+                {/* Third Column */}
+                <Grid item xs={1}>
+                    <ListItemText
+                        primary={unit}
+                        primaryTypographyProps={{ fontSize: "2.5rem", paddingLeft: "2px"}}
+                        style={{ textAlign: "left", color: "white", width: "100px" }}
+                    />
+                </Grid>
+            </Grid>
+        </ListItem>
     );
-  }
 }
+
+export default Item;

@@ -4,6 +4,9 @@ from django.contrib.auth.models import User
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    
+    # category is a foreign key so we need to serialize it
+    # category = serializers.CharField(source='category.name')
     class Meta:
         model = Product
         fields = ('id','category', 'name', 'price','unit')

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import List from "@mui/material/List";
-const NewItem = React.lazy(() => import("./NewItem"));
+const NewItem = React.lazy(() => import("./Item"));
 import { Box, Typography } from "@material-ui/core";
 
 export default function CategoryList(props) {

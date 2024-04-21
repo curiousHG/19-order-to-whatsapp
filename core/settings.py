@@ -39,7 +39,7 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "19-order-to-whatsapp-production.up.railway.app",
     "19onlineShop.com",
-    "1bec-103-27-8-107.in.ngrok.io"
+    "192.168.0.101",
 ]
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000",
@@ -153,7 +153,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+# time zone of india
+TIME_ZONE = "Asia/Kolkata"
 
 USE_I18N = True
 

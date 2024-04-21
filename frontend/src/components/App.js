@@ -1,6 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import HomePage from './HomePage';
+import HomePage from '../pages/HomePage';
 
 export default function App() {
     return (

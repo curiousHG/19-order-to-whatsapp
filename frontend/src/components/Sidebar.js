@@ -1,7 +1,7 @@
 // import "./css/sidebar.css";
 import React, { Component } from "react";
 import SidebarLink from "./SidebarLink";
-import logo from "./images/logo.jpg";
+import logo from "../assets/images/logo.jpg";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 

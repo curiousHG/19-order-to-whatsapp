@@ -10,7 +10,7 @@ class Category(models.Model):
 
     class Meta:
         verbose_name_plural = "categories"
-        ordering = ("name",)
+        ordering = ["name",]
 
     def __str__(self) -> str:
         return self.name
@@ -23,7 +23,8 @@ class Product(models.Model):
     )
     name = models.CharField(max_length=100, db_index=True)
     slug = models.SlugField(max_length=100, db_index=True, blank=True)
-
+    # time is utc + 5:30
+    last_updated = models.DateTimeField(auto_now=True)
     class QuantityDenomination(models.TextChoices):
         KG = "KG", "Kilogram"
         LTR = "LTR", "Liter"
