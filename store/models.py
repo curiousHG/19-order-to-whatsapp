@@ -73,7 +73,15 @@ class Order(models.Model):
     order_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Order #{self.pk} - {self.customer.username}"
+        return f"Order #{self.pk} - {self.customer.name}"
+    
+    def formatted_products(self):
+        product_list = [f'{product["product"]}: {product["quantity"]}' for product in self.products]
+        res = ", ".join(product_list)
+        return res
+    
+    def customer_address(self):
+        return self.customer.address
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)

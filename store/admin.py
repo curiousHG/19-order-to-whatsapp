@@ -30,13 +30,14 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'customer', 'order_date', 'products']
+    list_display = ['id', 'customer', 'customer_address', 'order_date', 'formatted_products']
     list_filter = ['order_date']
-    search_fields = ['id', 'customer__username']
+    search_fields = ['id', 'customer__name']
     inlines = [OrderItemInline]
     readonly_fields = ['customer', 'order_date']
     can_delete = False
     actions = None
+
 
     def has_add_permission(self, request):
         return False
