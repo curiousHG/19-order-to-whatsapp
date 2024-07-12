@@ -21,10 +21,9 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('' , include('frontend.urls',namespace='frontend')),
+    path('store/', include('store.urls', namespace = 'store')),
+    
 ]
-
-if settings.DEBUG:
-    urlpatterns += path('store/', include('store.urls', namespace = 'store')),
 
 
 if settings.DEBUG:
