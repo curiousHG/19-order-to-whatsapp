@@ -25,13 +25,12 @@ SECRET_KEY = 'django-insecure-)xya^bmtzkh&(=$7rt6af&mypnhxn5-k7*5%qtm98jj!h$r*(r
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# allow all hosts for development purposes like ngrok
 ALLOWED_HOSTS = [
-
+    '*'
 ]
 
-
 CORS_ALLOW_ALL_ORIGINS = True
-
 
 # Application definition
 
@@ -131,7 +130,6 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'frontend', 'dist', 'assets'),  # <-- Add this
     os.path.join(BASE_DIR, 'frontend', 'dist'),  # <-- Add this
 ]
-TEMPLATES[0]['DIRS'].append(os.path.join(BASE_DIR, 'frontend', 'dist'))  # <-- Add this
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
