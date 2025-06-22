@@ -1,25 +1,21 @@
 import { useEffect, useState } from "react";
 import { getCategories } from "../api/categories";
-
+import { NavBar } from "../components/NavBar";
+import { Header } from "../components/Header";
+import { Catalog } from "../components/Catalog";
 
 
 function Home() {
-  const [apiData, setApiData] = useState(null);
 
-  useEffect(() => {
-    getCategories()
-      .then(setApiData)
-      .catch((e) => {
-        setApiData("API error");
-        console.error("Error fetching API data:", e);
-      });
-  }, []);
 
   return (
-    <div>
-      <h1>Welcome to the Home Page</h1>
-      <h2>API Test:</h2>
-      <pre>{JSON.stringify(apiData, null, 2)}</pre>
+    <div className="flex flex-col min-h-screen bg-gray-200">
+      <Header />
+      <div className="flex-1 overflow-hidden">
+
+      <Catalog />
+      </div>
+      <NavBar />
     </div>
   );
 }

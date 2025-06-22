@@ -1,12 +1,15 @@
 
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 const getCategories = async () => {
-  const response = await fetch(`${API_BASE_URL}/api/categories/`);
+  const response = await fetch(`/api/categories/`).then((res) => {
+    if (!res.ok) {
+      throw new Error(`Failed to fetch categories, ${res.status} ${res.statusText}`);
+    }
+    return res;
+  });
   if (!response.ok) {
-    throw new Error('Failed to fetch categories');
+    throw new Error(`Failed to fetch categories, ${response.status} ${response.statusText}`);
   }
-  return response.json();
+  return response.body;
 }
 
 export { getCategories };
