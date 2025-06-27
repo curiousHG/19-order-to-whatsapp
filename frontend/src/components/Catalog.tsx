@@ -1,5 +1,3 @@
-import { SearchBar } from './SearchBar'
-import { CategorySlider } from './CategorySlider'
 import { Category } from './Category'
 
 export const Catalog = () => {
