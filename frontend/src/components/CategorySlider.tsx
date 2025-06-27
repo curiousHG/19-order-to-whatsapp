@@ -2,14 +2,16 @@ import { useState, useEffect } from "react";
 import { getCategories } from "../api/categories";
 
 export const CategorySlider = () => {
-  const [apiData, setApiData] = useState<any[]>([]);
+  const [apiData, _] = useState<any[]>([]);
+  console.log(apiData);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await getCategories();
         const data = response ? response : [];
-        setApiData(data);
+        console.log("Fetched categories:", data);
+        // setApiData(data);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
