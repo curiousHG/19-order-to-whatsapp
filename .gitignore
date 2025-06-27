@@ -2,7 +2,7 @@ frontend/node_modules
 *.sqlite3
 **/__pycache__
 data
-venv/
+.venv/
 # All DS_Store files
 */.DS_Store
 .vscode
