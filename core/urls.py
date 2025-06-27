@@ -17,7 +17,6 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.views.generic import TemplateView
-import api
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,4 +25,3 @@ urlpatterns = [
     # Include the store app's URLs
     # path('api/', include('store.urls')),  # Assuming store.urls is the URL configuration for the store app
 ]
-

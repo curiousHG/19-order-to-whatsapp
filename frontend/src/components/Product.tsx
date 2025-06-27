@@ -1,19 +1,38 @@
-import React from 'react'
-
+import dal from "../assets/dal.jpeg";
 export const Product = () => {
+
+  // on tapping kbd change its value to Kg
+
+  const denominations: string[] = ["Gm", "Kg", "Ltr", "Pcs"];
+
+  const handleKbdClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const kbdElement = event.currentTarget;
+    const currentIndex = denominations.indexOf(kbdElement.textContent || "");
+    const nextIndex = (currentIndex + 1) % denominations.length;
+    kbdElement.textContent = denominations[nextIndex];
+    kbdElement.className = `kbd kbd-sm kbd-${denominations[nextIndex].toLowerCase()}`;
+  };
+
   return (
-    <li className="list-row">
-    <div><img className="size-10 rounded-box" src="https://img.daisyui.com/images/profile/demo/1@94.webp"/></div>
-    <div>
-      <div>Dio Lupa</div>
-      <div className="text-xs uppercase font-semibold opacity-60">Remaining Reason</div>
-    </div>
-    <button className="btn btn-square btn-ghost">
-      <svg className="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor"><path d="M6 3L20 12 6 21 6 3z"></path></g></svg>
-    </button>
-    <button className="btn btn-square btn-ghost">
-      <svg className="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></g></svg>
-    </button>
-  </li>
-  )
-}
+    <li className="list-row justify-between items-center p-2 flex gap-3">
+      <div>
+        <img
+          className="size-15 rounded-box"
+          src={dal}
+        />
+      </div>
+      <div className="flex-1 flex flex-col gap-1">
+        <div>Masoor Dal</div>
+        <div className="text-xs uppercase font-semibold opacity-60">
+          19 Special
+        </div>
+      </div>
+      <label className="input m-0 p-1 w-1/2">
+        <input type="text" placeholder="Enter Quantity" className="input" />
+        <kbd className="kbd kbd-sm" onClick={handleKbdClick}>
+          Gm
+        </kbd>
+      </label>
+    </li>
+  );
+};

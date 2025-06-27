@@ -25,7 +25,7 @@ export const CategorySlider = () => {
           id: i + 1,
           name: `Category ${i + 1}`,
         })).map((category) => (
-          <button key={category.id} className="btn btn-primary">
+          <button key={category.id} className="btn">
             {category.name}
           </button>
         ))}
