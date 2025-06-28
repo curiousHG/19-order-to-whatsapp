@@ -9,31 +9,32 @@ import { Box, Typography } from "@material-ui/core";
 const Item = ({ item, data }) => {
 
     // define state
-    // console.log(data);
+    // console.log(item);
+    const productKey = item.name +" "+item.description;
     const [quantity, setQuantity] = useState("");
     const [unit, setUnit] = useState(item.unit);
 
     const onChange = (e) => {
         setQuantity(e.target.value);
-        data[item.name] = e.target.value + " " + unit;
+        data[productKey] = e.target.value + " " + unit;
     }
     const onBlur = (e) => {
 
         if(quantity==="" || quantity == 0){
             setQuantity("");
-            delete data[item.name];
+            delete data[productKey];
         }else if (quantity < 1 && unit != "Pc") {
             setQuantity(quantity * 1000);
             setUnit("gm");
-            data[item.name] = quantity*1000 + " " + "gm";
+            data[productKey] = quantity*1000 + " " + "gm";
         }else if(quantity > 99 && unit != "Pc"){
                 setQuantity(quantity);
                 setUnit("gm");
-                data[item.name] = quantity + " " + "gm";
+                data[productKey] = quantity + " " + "gm";
         }else if (quantity >= 1 && unit != "Pc") {
             setQuantity(quantity);
             setUnit("KG");
-            data[item.name] = quantity + " " + "KG";
+            data[productKey] = quantity + " " + "KG";
         }
     }
     return (
@@ -42,7 +43,7 @@ const Item = ({ item, data }) => {
                 {/* First Column */}
                 <Grid item xs={7}>
                     <ListItemText
-                        primary={item.name}
+                        primary={productKey}
                         primaryTypographyProps={{ fontSize: "2.5rem" }}
                         style={{ textAlign: "left", color: "white" }}
                     />

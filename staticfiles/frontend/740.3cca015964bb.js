@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkfrontend=self.webpackChunkfrontend||[]).push([[740],{9740:(e,n,t)=>{t.r(n),t.d(n,{default:()=>l});var r=t(6540);function l(){return r.createElement("div",null,r.createElement("h1",null,"Price Page"))}}}]);
+//# sourceMappingURL=740.js.a44976f863d5.map
