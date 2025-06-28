@@ -46,11 +46,10 @@ class CategoryListView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
-    # if category/atta then return products with category atta
-    def get(self, request, category=None, format=None):
-        if category:
+    def get(self, request, category_id=None, format=None):
+        if category_id is not None:
             # category = category.upper()
-            products = Product.objects.filter(category__name=category)
+            products = Product.objects.filter(category__id=category_id)
             serializer = ProductSerializer(products, many=True)
             return Response(serializer.data)
         return self.list(request)
