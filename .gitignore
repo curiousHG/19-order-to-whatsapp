@@ -20,3 +20,4 @@ csv_data_add.py
 .env-new
 staticfiles_issue.txt
 .DS_Store
+.venv/

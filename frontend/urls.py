@@ -7,6 +7,5 @@ urlpatterns = [
     path('final/', index),
     path('price/', index),
     path('bill/', index),
-    # path('test/', index)
 ]
 app_name = 'core'
