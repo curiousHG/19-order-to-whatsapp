@@ -21,10 +21,10 @@ export const Category = ({ id, name }: { id: number; name: string }) => {
         <img
           src={Unknown}
           alt="Category"
-          className="w-full h-full  object-cover rounded-lg"
+          className="w-full h-full object-cover rounded-t-lg"
         />
         {/* make it transparent */}
-        <div className="absolute inset-0 backdrop-blur-[2px] flex items-center justify-center rounded-lg">
+        <div className="absolute inset-0 backdrop-blur-[0.25px] flex items-center justify-center rounded-lg">
           <h2 className="text-white text-2xl font-bold">{name}</h2>
         </div>
       </div>
@@ -32,8 +32,8 @@ export const Category = ({ id, name }: { id: number; name: string }) => {
 
       <ul className="list bg-base-100 rounded-box shadow-md w-full">
         {products
-          ? products.map((product) => (
-              <Product key={product.id} product={product} />
+          ? products.map((product, idx) => (
+              <Product key={idx} product={product} />
             ))
           : null}
       </ul>

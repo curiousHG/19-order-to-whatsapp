@@ -1,8 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
+from cloudinary.models import CloudinaryField
 
 # Create your models here.
 # custom model of quantity denomination of Kg, Ltr, Gm, packet
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100, db_index=True)
@@ -10,7 +12,9 @@ class Category(models.Model):
 
     class Meta:
         verbose_name_plural = "categories"
-        ordering = ["name",]
+        ordering = [
+            "name",
+        ]
 
     def __str__(self) -> str:
         return self.name
@@ -25,19 +29,18 @@ class Product(models.Model):
     slug = models.SlugField(max_length=100, db_index=True, blank=True)
     # time is utc + 5:30
     last_updated = models.DateTimeField(auto_now=True)
+
     class QuantityDenomination(models.TextChoices):
-        KG = "KG", "Kilogram"
-        LTR = "LTR", "Liter"
-        GM = "gm", "Gram"
+        KG = "Kg", "Kilogram"
+        LTR = "Lt", "Liter"
+        GM = "Gm", "Gram"
         PC = "Pc", "Pc"
         # allow to add more choices
-
 
     unit = models.CharField(
         max_length=7,
         choices=QuantityDenomination.choices,
         default=QuantityDenomination.KG,
-
     )
     created_by = models.ForeignKey(
         User, related_name="products", on_delete=models.CASCADE, null=True, default=1
@@ -46,7 +49,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=0, default=0)
     quantity = models.IntegerField(default=0, blank=True)
     available = models.BooleanField(default=True)
-    image = models.ImageField(upload_to="images/", blank=True)
+    image = CloudinaryField('image')
 
     class Meta:
         verbose_name_plural = "Products"
@@ -55,7 +58,9 @@ class Product(models.Model):
     def __str__(self) -> str:
         return self.name
 
+
 # create a model for Customer
+
 
 class Customer(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
@@ -65,7 +70,8 @@ class Customer(models.Model):
 
     def __str__(self) -> str:
         return self.name
-    
+
+
 class Order(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True)
     # products is just a dict with name as key and quantity as value
@@ -74,18 +80,21 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order #{self.pk} - {self.customer.name}"
-    
+
     def formatted_products(self):
-        product_list = [f'{product["product"]}: {product["quantity"]}' for product in self.products]
+        product_list = [
+            f'{product["product"]}: {product["quantity"]}' for product in self.products
+        ]
         res = ", ".join(product_list)
         return res
-    
+
     def customer_address(self):
         return self.customer.address
 
+
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    product = models.ForeignKey("Product", on_delete=models.CASCADE)
     quantity = models.CharField(max_length=100)
 
     def __str__(self):

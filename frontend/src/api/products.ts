@@ -3,8 +3,10 @@ interface Product {
   id: number;
   category: number;
   name: string;
+  image: string;
   price: number;
   unit: string;
+  description: string;
 }
 
 const getProducts = async (categoryId: number) => {
