@@ -1,4 +1,4 @@
-import {create } from 'zustand';
+import { create } from 'zustand';
 import { getCategories, type Category } from '../api/categories';
 
 interface CategoryStore {
