@@ -23,12 +23,10 @@ export const Header = () => {
     //     {language === "en" ? "🇮🇳 हिंदी" : "🇬🇧 English"}
     //   </button>
     // </div>
-    <div className="flex items-center justify-around w-full max-w-2xl mx-auto p-1 pt-2">
+    <div className="mx-auto flex w-full max-w-2xl items-center justify-around p-1 pt-2">
       <div className="flex items-center">
         <img src={logo} alt="Logo" className="h-12" />
-        <h1 className="text-4xl font-bold text-amber-600 ml-2">
-          Khari Baoli
-        </h1>
+        <h1 className="ml-2 text-4xl font-bold text-amber-600">Khari Baoli</h1>
       </div>
 
       <button
