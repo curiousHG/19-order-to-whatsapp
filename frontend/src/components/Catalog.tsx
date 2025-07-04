@@ -12,12 +12,12 @@ export const Catalog = ({ categoryRefs }: { categoryRefs: React.MutableRefObject
   return (
     <div className="flex flex-col flex-1 items-center p-1">
       <div className="h-full w-full flex-1 flex items-center justify-center">
-        <div className="flex flex-col gap-4 items-center w-full max-w-2xl">
+        <div className="flex flex-col gap-4 items-center w-full max-w-2xl flex-1">
           {categories.map((category) => (
             <div
               key={category.id}
-              ref={(el) => (categoryRefs.current[category.id] = el)}
-              className="w-full scroll-mt-44"
+              ref={(el) => { categoryRefs.current[category.id] = el; }}
+              className="flex w-full scroll-mt-44 items-center justify-center"
             >
             <Category key={category.id} id={category.id} name={category.name} />
             </div>

@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   // allow ngrok
   server: {
-    allowedHosts: ['c2ec-2406-7400-56-7a22-e82d-911c-27a0-5f7d.ngrok-free.app'],
+    allowedHosts: ['57d2-2406-7400-56-7a22-7819-c84c-d6db-448.ngrok-free.app'],
     proxy: {
       '/store': {
         target: 'http://127.0.0.1:8000',

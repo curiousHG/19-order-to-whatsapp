@@ -54,12 +54,12 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    'cloudinary_storage',
+    # 'cloudinary_storage', having this causes static files issue
+    'cloudinary', 
     "django.contrib.staticfiles",
     "rest_framework",
     "corsheaders",
     "store",
-    'cloudinary',
 ]
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
@@ -163,20 +163,17 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
-
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/assets/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'frontend', 'dist', 'assets'),  # <-- Add this
-    os.path.join(BASE_DIR, 'frontend', 'dist'),  # <-- Add this
+    os.path.join(BASE_DIR, 'frontend', 'dist'),  # <-- Add this 
+    os.path.join(BASE_DIR, 'frontend', 'dist','assets'),  # <-- Add this
 ]
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -184,4 +181,4 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 MEDIA_URL = '/media/'  # or any prefix you choose
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
