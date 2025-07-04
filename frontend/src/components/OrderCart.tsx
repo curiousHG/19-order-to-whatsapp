@@ -1,4 +1,5 @@
 import { useOrderStore } from "../store/useOrderStore";
+import { FaWhatsapp } from "react-icons/fa6";
 
 export const OrderCart = () => {
   const { order, removeProduct } = useOrderStore();
@@ -24,7 +25,7 @@ export const OrderCart = () => {
   // const productImage = product.image? `https://res.cloudinary.com/dbwetv45x/${product.image}`: dal
 
   return (
-    <div className="p-4 flex flex-col flex-1 min-h-screen ">
+    <div className="p-4 flex flex-col flex-1 min-h-screen items-center">
       <div className="flex flex-col gap-3 max-w-2xl mx-auto w-full">
         <h2 className="text-xl font-bold mb-4 text-center">Your Cart</h2>
 
@@ -32,13 +33,13 @@ export const OrderCart = () => {
           {orderItems.map((item) => (
             <li
               key={item.id}
-              className="flex justify-between items-center bg-base-200 p-3 rounded-lg"
+              className="flex justify-between items-center bg-base-200 p-2 rounded-lg"
             >
               <div className="flex items-center w-full justify-between pr-6">
                 <div className="flex gap-2">
                   <img src={ item.image ? `https://res.cloudinary.com/dbwetv45x/${item.image}` : ""} alt={item.name} className="w-10 h-10 rounded-lg"/>
                   <div className="flex flex-col ">
-                    <p className="font-medium">{item.name}</p>
+                    <p className="font-semibold">{item.name}</p>
                     <span className="text-xs opacity-70">
                       {item.description}
                     </span>
@@ -50,7 +51,7 @@ export const OrderCart = () => {
                 </span>
               </div>
               <button
-                className="btn btn-xs btn-outline btn-error"
+                className="btn btn-xs btn-outline btn-error rounded-4xl"
                 onClick={() => removeProduct(item.id)}
               >
                 {/* minus icon */}
@@ -75,10 +76,11 @@ export const OrderCart = () => {
       </div>
 
       <button
-        className="btn btn-primary mt-6 w-full fixed bottom-20 left-2 max-w-sm mx-auto"
+        className="btn btn-success mt-6 w-full fixed bottom-20 max-w-sm mx-auto text-lg"
         onClick={handleConfirm}
       >
-        Confirm Order
+        <FaWhatsapp className="text-2xl"/>
+        Send Order to Whatsapp
       </button>
     </div>
   );
