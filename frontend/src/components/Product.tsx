@@ -3,21 +3,23 @@ import { useState } from "react";
 import { type Product as ProductType } from "../api/products";
 import { useOrderStore } from "../store/useOrderStore";
 import { ProductQuantityDrawer } from "./ProductQuantityDrawer";
+import { cloudinaryImageBaseUrl } from "../constants";
 
-export const Product = ({ product }: { product: ProductType }) => {
+const Product = ({ product }: { product: ProductType }) => {
   // on tapping kbd change its value to Kg
 
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const { order } = useOrderStore();
   const productImage = product.image
-    ? `https://res.cloudinary.com/dbwetv45x/${product.image}`
+    ? `${cloudinaryImageBaseUrl}/${product.image}`
     : dal;
 
   return (
     <li className="list-row flex items-center justify-between gap-3 p-2">
       <div>
         <img
+          loading="lazy"
           className="rounded-box size-15"
           src={productImage}
           alt={product.name}
@@ -36,11 +38,13 @@ export const Product = ({ product }: { product: ProductType }) => {
           {order[product.id] ? "Edit" : "Add to Cart"}
         </button>
         <ProductQuantityDrawer
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        product={product}
-      />
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          product={product}
+        />
 
     </li>
   );
 };
+
+export default Product

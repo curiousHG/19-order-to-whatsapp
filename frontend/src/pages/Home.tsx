@@ -14,7 +14,7 @@ function Home() {
     <div className="flex min-h-screen flex-col items-center justify-center">
       <div
         id="fixed-header"
-        className="fixed top-0 left-0 z-5 flex w-full flex-col items-center bg-white p-2 shadow-xs backdrop-blur-md"
+        className="fixed top-0 left-0 z-5 flex w-full flex-col items-center bg-white p-2 shadow-xs"
       >
         <Header />
         {activePage === "store" && (

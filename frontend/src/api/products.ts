@@ -15,7 +15,7 @@ const getProducts = async (categoryId: number) => {
     throw new Error(`Failed to fetch products, ${response.status} ${response.statusText}`);
   }
   const data = await response.json();
-  console.log(data)
+  // console.log(data)
   return data;
 };
 

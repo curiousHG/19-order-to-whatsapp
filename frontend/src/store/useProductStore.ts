@@ -18,7 +18,7 @@ const useCategoryProductStore = create<CategoryProductStore>((set, get) => ({
         }
         try {
             const products = await getProducts(categoryId); 
-            console.log(`Fetched products for category ${categoryId}:`, products);
+            // console.log(`Fetched products for category ${categoryId}:`, products);
             set((state) => ({
                 productsByCategoryId: {
                     ...state.productsByCategoryId,

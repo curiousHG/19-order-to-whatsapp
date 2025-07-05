@@ -12,6 +12,7 @@ export const useCategoryStore = create<CategoryStore>((set, get) => ({
     // only fetch categories if they are not already loaded
     const categories = get().categories;
     if (categories.length === 0) {
+      console.log('Fetching categories from API...');
       const data = await getCategories();
       set({ categories: data });
     }
