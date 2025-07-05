@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv, find_dotenv
+
 env = load_dotenv(find_dotenv(), override=True)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -37,8 +38,8 @@ ALLOWED_HOSTS = [
     "19-order-to-whatsapp-production.up.railway.app",
     "19onlineShop.com",
     "192.168.0.101",
-    "localhost:5173"
-
+    "localhost:5173",
+    "f2fa-2406-7400-56-7a22-b913-3e47-8c67-3d65.ngrok-free.app",
 ]
 
 CORS_ORIGIN_WHITELIST = [
@@ -55,7 +56,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     # 'cloudinary_storage', having this causes static files issue
-    'cloudinary', 
+    "cloudinary",
     "django.contrib.staticfiles",
     "rest_framework",
     "corsheaders",
@@ -84,7 +85,7 @@ ROOT_URLCONF = "core.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        'DIRS': [os.path.join(BASE_DIR, 'frontend', 'dist')],  # <-- Add this
+        "DIRS": [os.path.join(BASE_DIR, "frontend", "dist")],  # <-- Add this
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -97,14 +98,17 @@ TEMPLATES = [
     },
 ]
 
-CSRF_TRUSTED_ORIGINS = ['https://19onlineshop.com', 'https://www.19onlineshop.com', 'http://localhost:3000']
+CSRF_TRUSTED_ORIGINS = [
+    "https://19onlineshop.com",
+    "https://www.19onlineshop.com",
+    "http://localhost:3000",
+]
 
 WSGI_APPLICATION = "core.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
 
 
 if DEBUG:
@@ -119,13 +123,13 @@ if DEBUG:
     }
 else:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv("DB_NAME"),
-            'USER': 'postgres',
-            'PASSWORD': os.getenv("DB_PASSWORD"),
-            'HOST': os.getenv("DB_HOST"),
-            'PORT': os.getenv("DB_PORT"),
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("DB_NAME"),
+            "USER": "postgres",
+            "PASSWORD": os.getenv("DB_PASSWORD"),
+            "HOST": os.getenv("DB_HOST"),
+            "PORT": os.getenv("DB_PORT"),
         }
     }
 
@@ -163,16 +167,16 @@ USE_L10N = True
 
 USE_TZ = True
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_URL = '/assets/'
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_URL = "/assets/"
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'frontend', 'dist'),  # <-- Add this 
-    os.path.join(BASE_DIR, 'frontend', 'dist','assets'),  # <-- Add this
+    os.path.join(BASE_DIR, "frontend", "dist"),  # <-- Add this
+    os.path.join(BASE_DIR, "frontend", "dist", "assets"),  # <-- Add this
 ]
 
 # Default primary key field type
@@ -180,5 +184,6 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-MEDIA_URL = '/media/'  # or any prefix you choose
+MEDIA_URL = "/media/"  # or any prefix you choose
 
+CLOUDINARY_STORAGE = {"SECURE": True}

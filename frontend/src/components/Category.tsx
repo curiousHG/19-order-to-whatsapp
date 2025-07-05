@@ -1,5 +1,5 @@
 // import { Product } from "./Product";
-import React, { Suspense } from "react";
+import React from "react";
 const Product = React.lazy(() => import("./Product"));
 import defaultCategory from "../assets/defaultCategory.jpeg";
 import { useCategoryProductStore } from "../store/useProductStore";
