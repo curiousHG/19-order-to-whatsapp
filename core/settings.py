@@ -37,7 +37,8 @@ ALLOWED_HOSTS = [
     "19-order-to-whatsapp-production.up.railway.app",
     "19onlineShop.com",
     "192.168.0.101",
-    "localhost:5173"
+    "localhost:5173",
+    "f2fa-2406-7400-56-7a22-b913-3e47-8c67-3d65.ngrok-free.app"
 
 ]
 
@@ -182,3 +183,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 MEDIA_URL = '/media/'  # or any prefix you choose
 
+CLOUDINARY_STORAGE = {
+    'SECURE': True
+}

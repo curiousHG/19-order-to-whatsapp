@@ -9,6 +9,8 @@ from cloudinary.models import CloudinaryField
 class Category(models.Model):
     name = models.CharField(max_length=100, db_index=True)
     slug = models.SlugField(max_length=100, db_index=True, unique=True, blank=True)
+    image = CloudinaryField('image')
+    product_count = models.PositiveIntegerField(default=0)
 
     class Meta:
         verbose_name_plural = "categories"

@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics, viewsets, status
 from rest_framework.decorators import api_view
+from cloudinary.utils import cloudinary_url
 
 
 def all_products(request):
@@ -21,7 +22,21 @@ def all_products(request):
 class AllCategories(APIView):
     def get(self, request):
         categories = Category.objects.all()
-        data = [{"id": category.id, "name": category.name} for category in categories]
+        data = [
+            {
+                "id": category.id,
+                "name": category.name,
+                "image": cloudinary_url(
+                    category.image.public_id,
+                    secure=True,
+                    transformation=[
+                        {"width": 100, "quality": "auto", "fetch_format": "auto"}
+                    ],
+                )[0] if category.image.url else "",
+                "product_count": category.product_count,
+            }
+            for category in categories
+        ]
         return Response(data)
 
 
@@ -53,7 +68,7 @@ class CategoryListView(generics.ListCreateAPIView):
             serializer = ProductSerializer(products, many=True)
             return Response(serializer.data)
         return self.list(request)
-    
+
     # this is post request to update the prices of all products in a category
     def post(self, request, format=None):
         pass
