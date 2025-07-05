@@ -33,7 +33,7 @@ export const ProductQuantityDrawer = ({
     >
       <h3 className="text-lg font-bold">{product.name}</h3>
       <p className="text-sm text-gray-500">{product.description}</p>
-      <div className="mt-4 flex items-center gap-1">
+      <div className="mt-4 flex items-center justify-around">
         <input
           type="number"
           placeholder="Enter quantity"
@@ -44,7 +44,7 @@ export const ProductQuantityDrawer = ({
           }}
           className="input input-md"
         />
-        <kbd className="kbd kbd-sm">{product.unit}</kbd>
+        <kbd className="kbd kbd-md">{product.unit}</kbd>
       </div>
       <div className="mt-4 flex justify-end gap-2">
         <button className="btn btn-ghost" onClick={onClose}>
