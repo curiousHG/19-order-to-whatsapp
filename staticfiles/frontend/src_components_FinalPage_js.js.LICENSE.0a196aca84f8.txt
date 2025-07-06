@@ -1,0 +1,55 @@
+/*! ../api/postCustomer */
+
+/*! ../api/postOrder */
+
+/*! ../className */
+
+/*! ../styles */
+
+/*! ../styles/identifier */
+
+/*! ./boxClasses */
+
+/*! ./utils/createSvgIcon */
+
+/*! @babel/runtime/helpers/interopRequireDefault */
+
+/*! @mui/icons-material/WhatsApp */
+
+/*! @mui/material */
+
+/*! @mui/system */
+
+/*! @mui/utils/generateUtilityClasses */
+
+/*! axios */
+
+/*! prop-types */
+
+/*! react */
+
+/*! react/jsx-runtime */
+
+/*!******************************!*\
+  !*** ./src/api/postOrder.js ***!
+  \******************************/
+
+/*!*********************************!*\
+  !*** ./src/api/postCustomer.js ***!
+  \*********************************/
+
+/*!*************************************!*\
+  !*** ./src/components/FinalPage.js ***!
+  \*************************************/
+
+/*!***********************************************!*\
+  !*** ./node_modules/@mui/material/Box/Box.js ***!
+  \***********************************************/
+
+/*!******************************************************!*\
+  !*** ./node_modules/@mui/icons-material/WhatsApp.js ***!
+  \******************************************************/
+
+/*!******************************************************!*\
+  !*** ./node_modules/@mui/material/Box/boxClasses.js ***!
+  \******************************************************/

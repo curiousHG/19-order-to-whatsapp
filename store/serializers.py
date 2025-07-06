@@ -9,8 +9,7 @@ class ProductSerializer(serializers.ModelSerializer):
     # category = serializers.CharField(source='category.name')
     class Meta:
         model = Product
-        fields = ('id','category', 'name', 'price','unit', 'description')
-
+        fields = ('id','category', 'name', 'price','unit')
 
 class OrderSeralizer(serializers.ModelSerializer):
     products = ProductSerializer(many = True, read_only = True)

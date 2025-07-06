@@ -1,5 +1,4 @@
 frontend/node_modules
-frontend/dist
 *.sqlite3
 **/__pycache__
 data
@@ -20,4 +19,3 @@ csv_data_add.py
 .env-new
 staticfiles_issue.txt
 .DS_Store
-.venv/

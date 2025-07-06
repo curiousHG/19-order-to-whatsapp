@@ -1,0 +1,79 @@
+html,
+body {
+    width: 100%;
+    background-color: #e8e875;
+}
+
+.link {
+    display: flex;
+    align-items: cover;
+    cursor: pointer;
+    border-radius: 10px;
+    padding: 5px 0 5px 0;
+}
+
+.link:hover {
+    background-color: lightskyblue;
+    color: black;
+    transition: color 100ms ease-out;
+}
+
+.link:hover .link-text {
+    color: black;
+    transition: color 100ms ease-out;
+}
+
+#fixed-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    grid-gap: 10px;
+    padding: 10px;
+    height: 100%;
+    /* make scrollable up to 600px */
+    max-height: 600px;
+}
+
+.sidebar {
+    /* width: 250px; */
+    /* min-width: 200px; */
+    padding: 10px 20px;
+    margin: 10px 0 auto;
+    margin-bottom: 10px;
+    box-shadow: 0 0 6px hsl(210 14% 90%);
+    border-color: black;
+    background-color: #f14d52;
+}
+
+
+.flex-section {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.flex-col-scroll {
+    flex-grow: 1;
+    overflow: auto;
+    min-height: 100%;
+}
+
+.flex-no-shrink {
+    flex-shrink: 0;
+}
+
+#main {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.grid-container {
+    height: calc(100% - 64px);
+}
+
+.grid-column {
+    height: 100%;
+    overflow-y: auto;
+}
