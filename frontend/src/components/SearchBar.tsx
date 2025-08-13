@@ -1,4 +1,8 @@
+import { useCatalogStore } from "../store/useCatalogStore";
+
 export const SearchBar = () => {
+  const { searchQuery, setSearchQuery } = useCatalogStore();
+
   return (
     <label className="input">
       <svg
@@ -17,7 +21,13 @@ export const SearchBar = () => {
           <path d="m21 21-4.3-4.3"></path>
         </g>
       </svg>
-      <input type="search" className="grow" placeholder="Search" />
+      <input
+        type="search"
+        className="grow"
+        placeholder="Search"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
     </label>
   );
 };

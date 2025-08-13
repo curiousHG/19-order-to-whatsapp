@@ -14,7 +14,8 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv, find_dotenv
 
-env = load_dotenv(find_dotenv(), override=True)
+load_dotenv(find_dotenv(), override=True)
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
 # print(SECRET_KEY)
 
-DEBUG = os.getenv("DEBUG", "False") == True
+DEBUG = os.getenv("DEBUG", "True") == "True"
 # print(type(DEBUG))
 
 ALLOWED_HOSTS = [
@@ -60,6 +61,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "corsheaders",
+    'parler',
     "store",
 ]
 REST_FRAMEWORK = {
@@ -112,7 +114,7 @@ WSGI_APPLICATION = "core.wsgi.application"
 
 
 if DEBUG:
-    print("DEBUG MODE")
+    print("\033[92mUSING LOCAL DB\033[0m")  # Print in green
 
     DATABASES = {
         "default": {
@@ -122,6 +124,8 @@ if DEBUG:
         }
     }
 else:
+    # PRINT IN RED AS AN ALERT
+    print("\033[91mUSING REMOTE DB\033[0m")
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -152,6 +156,23 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+LANGUAGES = (
+    ('en', 'English'),
+    ('hi', 'Hindi'),
+    # add more languages here
+)
+
+PARLER_LANGUAGES = {
+    None: (
+        {'code': 'en'},
+        {'code': 'hi'},
+    ),
+    'default': {
+        'fallback': 'en',
+        'hide_untranslated': False,
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
