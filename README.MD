@@ -6,7 +6,7 @@ https://www.19onlineshop.com
 
 1. To run the backend
 ```
-source .venv/bin/activate
+source venv/bin/activate
 python3 manage.py runserver
 ```
 2. To run the frontend
