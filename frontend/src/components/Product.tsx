@@ -31,20 +31,16 @@ const Product = ({ product }: { product: ProductType }) => {
           {product.description}
         </div>
       </div>
-      <button
-          className="btn btn-sm"
-          onClick={() => setDrawerOpen(true)}
-        >
-          {order[product.id] ? "Edit" : "Add to Cart"}
-        </button>
-        <ProductQuantityDrawer
-          open={drawerOpen}
-          onClose={() => setDrawerOpen(false)}
-          product={product}
-        />
-
+      <button className="btn btn-sm" onClick={() => setDrawerOpen(true)}>
+        {order[product.id] ? "Edit" : "Add to Cart"}
+      </button>
+      <ProductQuantityDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        product={product}
+      />
     </li>
   );
 };
 
-export default Product
+export default Product;
