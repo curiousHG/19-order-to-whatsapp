@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-import os
+import os, sys
 from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv(), override=True)
@@ -208,3 +208,53 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 MEDIA_URL = "/media/"  # or any prefix you choose
 
 CLOUDINARY_STORAGE = {"SECURE": True}
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "[{levelname}] {asctime} {name}: {message}",
+            "style": "{",
+        },
+        "simple": {"format": "[{levelname}] {message}", "style": "{"},
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+            "stream": sys.stdout,  # Print to stdout for Railway logs
+        },
+        "errors": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+            "stream": sys.stderr,  # Print to stderr for Railway logs
+        },
+    },
+    "root": {
+        "handlers": ["console", "errors"],
+        "level": "DEBUG",  # Show all messages including exceptions
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console", "errors"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "django.request": {
+            "handlers": ["console", "errors"],
+            "level": "ERROR",  # Catch all 500 errors
+            "propagate": False,
+        },
+    },
+}
+
+import traceback
+from django.core.handlers.wsgi import WSGIHandler
+
+class LoggingWSGIHandler(WSGIHandler):
+    def handle_uncaught_exception(self, request, resolver, exc_info):
+        traceback.print_exception(*exc_info, file=sys.stderr)
+        super().handle_uncaught_exception(request, resolver, exc_info)
+
+WSGI_APPLICATION = "core.wsgi.application"
