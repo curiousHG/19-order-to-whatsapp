@@ -243,7 +243,7 @@ LOGGING = {
         },
         "django.request": {
             "handlers": ["console", "errors"],
-            "level": "ERROR",  # Catch all 500 errors
+            "level": "DEBUG",  # Catch all 500 errors
             "propagate": False,
         },
     },

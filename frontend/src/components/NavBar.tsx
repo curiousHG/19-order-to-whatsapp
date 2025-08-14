@@ -16,7 +16,7 @@ export const NavBar = () => {
   return (
     <button
       onClick={() => setActivePage(nextPage)}
-      className="bg-base-200 hover:bg-base-300 fixed bottom-5 left-3 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-colors"
+      className="bg-base-300 hover:bg-base-500 fixed bottom-5 left-3 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-colors"
       aria-label={label}
     >
       <img src={icon} alt={label} className="h-8 w-8" />
