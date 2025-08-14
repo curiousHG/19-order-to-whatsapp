@@ -15,7 +15,7 @@ PYTHONFAULTHANDLER = "1"
 [phases.setup]
 aptPkgs = ['libpq-dev', 'python3-dev', 'nodejs', 'npm']
 # You could also add gcc if needed
-nixPkgs = ['python313', 'postgresql_16.dev']
+nixPkgs = ['python313', 'postgresql_16.dev',"nodejs-20_x"]
 
 # --------------------------
 # Install Phase: Install Python + frontend dependencies
@@ -59,15 +59,13 @@ onlyIncludeFiles = [
 # Start Phase: Run migrations and start Gunicorn
 # --------------------------
 [start]
-cmd = ". /opt/venv/bin/activate && python manage.py migrate && gunicorn core.wsgi:application --bind 0.0.0.0:8080"
-runImage = "debian:bullseye-slim"
+runImage = "ghcr.io/railwayapp/nixpacks:latest"
+cmd = ". /opt/venv/bin/activate && python manage.py migrate && gunicorn core.wsgi"
 onlyIncludeFiles = [
-    "frontend/dist",
-    "staticfiles",
-    "core",
-    "store",
-    "manage.py",
-    "requirements.txt",
-    "core/wsgi.py",
-    "/opt/venv"
+  "/opt/venv",
+  "/app/core",
+  "/app/store",
+  "/app/manage.py",
+  "/app/frontend/dist",
+  "/app/staticfiles"
 ]
