@@ -196,8 +196,8 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATIC_URL = "/assets/"
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "frontend", "dist"),  # <-- Add this
-    os.path.join(BASE_DIR, "frontend", "dist", "assets"),  # <-- Add this
+    # os.path.join(BASE_DIR, "frontend", "dist"),  # <-- Add this
+    # os.path.join(BASE_DIR, "frontend", "dist", "assets"),  # <-- Add this
 ]
 
 # Default primary key field type
