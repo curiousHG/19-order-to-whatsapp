@@ -15,7 +15,7 @@ PYTHONFAULTHANDLER = "1"
 [phases.setup]
 aptPkgs = ['libpq-dev', 'python3-dev', 'nodejs', 'npm']
 # You could also add gcc if needed
-nixPkgs = ['python313', 'postgresql_16.dev',"nodejs-20_x"]
+nixPkgs = ['python313', 'postgresql_16.dev',"nodejs_20"]
 
 # --------------------------
 # Install Phase: Install Python + frontend dependencies
