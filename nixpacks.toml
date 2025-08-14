@@ -1,0 +1,8 @@
+providers = ['python', 'node']
+
+[phases.install]
+cmd = ["...","npm install --prefix frontend"]
+
+[phases.build]
+cmd = ["...","npm run build --prefix frontend"]
+
