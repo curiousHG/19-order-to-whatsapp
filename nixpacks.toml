@@ -59,7 +59,6 @@ onlyIncludeFiles = [
 # Start Phase: Run migrations and start Gunicorn
 # --------------------------
 [start]
-runImage = "ghcr.io/railwayapp/nixpacks:latest"
 cmd = ". /opt/venv/bin/activate && python manage.py migrate && gunicorn core.wsgi"
 onlyIncludeFiles = [
   "/opt/venv",
