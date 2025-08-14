@@ -54,7 +54,6 @@ onlyIncludeFiles = [
     "manage.py",
     "requirements.txt",
     "core/wsgi.py",
-    "/opt/venv"
 ]
 
 # --------------------------
