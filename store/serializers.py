@@ -30,50 +30,51 @@ class CustomerSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'address', 'date_created')
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    product_id = serializers.IntegerField(write_only=True)
+    unit = serializers.CharField()
+    quantity = serializers.FloatField()
 
-    # "products":{
-    #         "Chai Masala": "4 KG",
-    #         "Chakki Atta": "2 KG"
-    #     }
-    product = serializers.CharField()
-    quantity = serializers.CharField()
     class Meta:
         model = OrderItem
-        fields = ('product', 'quantity')
-
-class OrderSerializer(serializers.ModelSerializer):
-
-    products = serializers.ListField(child=OrderItemSerializer())
-    customer = CustomerSerializer()
-    class Meta:
-        model = Order
-        fields = ('customer', 'products')
+        fields = ("product_id", "quantity", "unit")
 
     def create(self, validated_data):
-        # print(validated_data)
-        
-        customer = validated_data.pop('customer')
-        products = validated_data.pop('products')
-        # print(products)
-        # products is a dict with name as key and quantity as value
-        """
-        "products":{
-            "Chai Masala": "4 KG",
-            "Chakki Atta": "2 KG"
-        }
-        """
+        product_id = validated_data.pop("product_id")
+        validated_data["product"] = Product.objects.get(pk=product_id)
+        return OrderItem.objects.create(**validated_data)
 
-        # everytime create a new customer 
-        user = Customer.objects.create(**customer)
-        order = Order.objects.create(customer=user)
+class OrderSerializer(serializers.ModelSerializer):
+    products = OrderItemSerializer(many=True)
+    customer = CustomerSerializer()
+
+
+    class Meta:
+        model = Order
+        fields = ("customer", "products")
+
+    def create(self, validated_data):
+        customer_data = validated_data.pop("customer")
+        products_data = validated_data.pop("products")
+
+         # Try to find existing customer by name and address
+        customer = Customer.objects.filter(
+            name=customer_data.get("name"),
+            address=customer_data.get("address")
+        ).first()
+
+        if not customer:
+            customer = Customer.objects.create(**customer_data)
+
+        order = Order.objects.create(customer=customer)
         products_list = []
-        for product_data in products:
-            product_name = product_data['product']
-            product_quantity = product_data['quantity']
-            item = {"product": product_name, "quantity": product_quantity}
+        for product_data in products_data:
+            product_id = product_data.get("product_id")
+            product = Product.objects.get(pk=product_id)
+            quantity = f'{product_data.get("quantity")} {product_data.get("unit")}'
+            item = {"product": product.name, "quantity": quantity}
             products_list.append(item)
-            product_obj = Product.objects.get(name=product_name)
-            OrderItem.objects.create(order=order, product=product_obj, quantity=product_quantity)
+            OrderItem.objects.create(order=order, product=product, quantity=quantity)
+
         order.products = products_list
         order.save()
         return order

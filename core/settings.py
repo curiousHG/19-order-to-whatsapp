@@ -11,10 +11,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-import os
+import os, sys
 from dotenv import load_dotenv, find_dotenv
 
-env = load_dotenv(find_dotenv(), override=True)
+load_dotenv(find_dotenv(), override=True)
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
 # print(SECRET_KEY)
 
-DEBUG = os.getenv("DEBUG", "False") == True
+DEBUG = os.getenv("DEBUG", "True") == "True"
 # print(type(DEBUG))
 
 ALLOWED_HOSTS = [
@@ -60,6 +61,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "corsheaders",
+    'parler',
     "store",
 ]
 REST_FRAMEWORK = {
@@ -112,7 +114,7 @@ WSGI_APPLICATION = "core.wsgi.application"
 
 
 if DEBUG:
-    print("DEBUG MODE")
+    print("\033[92mUSING LOCAL DB\033[0m")  # Print in green
 
     DATABASES = {
         "default": {
@@ -122,6 +124,8 @@ if DEBUG:
         }
     }
 else:
+    # PRINT IN RED AS AN ALERT
+    print("\033[91mUSING REMOTE DB\033[0m")
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -152,6 +156,23 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+LANGUAGES = (
+    ('en', 'English'),
+    ('hi', 'Hindi'),
+    # add more languages here
+)
+
+PARLER_LANGUAGES = {
+    None: (
+        {'code': 'en'},
+        {'code': 'hi'},
+    ),
+    'default': {
+        'fallback': 'en',
+        'hide_untranslated': False,
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -187,3 +208,51 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 MEDIA_URL = "/media/"  # or any prefix you choose
 
 CLOUDINARY_STORAGE = {"SECURE": True}
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "[{levelname}] {asctime} {name}: {message}",
+            "style": "{",
+        },
+        "simple": {"format": "[{levelname}] {message}", "style": "{"},
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+            "stream": sys.stdout,  # Print to stdout for Railway logs
+        },
+        "errors": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+            "stream": sys.stderr,  # Print to stderr for Railway logs
+        },
+    },
+    "root": {
+        "handlers": ["console", "errors"],
+        "level": "ERROR",  # Show all messages including exceptions
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console", "errors"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "django.request": {
+            "handlers": ["console", "errors"],
+            "level": "DEBUG",  # Catch all 500 errors
+            "propagate": False,
+        },
+    },
+}
+
+import traceback
+from django.core.handlers.wsgi import WSGIHandler
+
+class LoggingWSGIHandler(WSGIHandler):
+    def handle_uncaught_exception(self, request, resolver, exc_info):
+        traceback.print_exception(*exc_info, file=sys.stderr)
+        super().handle_uncaught_exception(request, resolver, exc_info)

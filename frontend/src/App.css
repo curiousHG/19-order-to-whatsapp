@@ -41,3 +41,9 @@
   --depth: 0;
   --noise: 0;
 }
+
+input,
+textarea,
+select {
+  font-size: 16px !important; /* Prevent zoom on iOS */
+}
