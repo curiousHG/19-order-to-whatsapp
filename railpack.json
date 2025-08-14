@@ -1,0 +1,20 @@
+{
+  "$schema": "https://schema.railpack.com",
+  "steps": {
+    "install": {
+      "commands": [
+        "pip install -r requirements.txt",                 // Python deps
+        "npm install --prefix frontend"                    // Frontend deps
+      ]
+    },
+    "build": {
+      "inputs": [{ "step": "install" }],
+      "commands": [
+        "npm run build --prefix frontend"                   // Build frontend -> dist/
+      ]
+    }
+  },
+  "deploy": {
+    "startCommand": "python manage.py migrate && gunicorn core.wsgi:application"
+  }
+}
