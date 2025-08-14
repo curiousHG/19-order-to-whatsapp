@@ -233,12 +233,12 @@ LOGGING = {
     },
     "root": {
         "handlers": ["console", "errors"],
-        "level": "DEBUG",  # Show all messages including exceptions
+        "level": "ERROR",  # Show all messages including exceptions
     },
     "loggers": {
         "django": {
             "handlers": ["console", "errors"],
-            "level": "DEBUG",
+            "level": "ERROR",
             "propagate": False,
         },
         "django.request": {
@@ -256,5 +256,3 @@ class LoggingWSGIHandler(WSGIHandler):
     def handle_uncaught_exception(self, request, resolver, exc_info):
         traceback.print_exception(*exc_info, file=sys.stderr)
         super().handle_uncaught_exception(request, resolver, exc_info)
-
-WSGI_APPLICATION = "core.wsgi.application"
