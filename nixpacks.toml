@@ -29,7 +29,8 @@ cmds = [
     ". /opt/venv/bin/activate && pip install -r requirements.txt",
 
     # Install frontend packages
-    "npm install --prefix frontend"
+    "npm install --prefix frontend",
+    "npm run build --prefix frontend"
 ]
 cacheDirectories = [
     "/root/.cache/pip",          # cache Python packages
@@ -42,7 +43,6 @@ cacheDirectories = [
 [phases.build]
 dependsOn = ['install']
 cmds = [
-    "npm run build --prefix frontend",
     ". /opt/venv/bin/activate && python manage.py collectstatic --noinput"
 ]
 # Only include the build artifacts in this phase
