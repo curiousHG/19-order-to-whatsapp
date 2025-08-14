@@ -47,7 +47,6 @@ cmds = [
 ]
 # Only include the build artifacts in this phase
 onlyIncludeFiles = [
-    "frontend/dist",
     "staticfiles",
     "core",
     "store",
