@@ -1,8 +1,75 @@
-providers = ['python', 'node']
+# Use the Python provider
+providers = ['...', 'python']
 
+# Base image for build
+buildImage = "ghcr.io/railwayapp/nixpacks:latest"
+
+# Environment variables in the container
+[variables]
+PYTHONUNBUFFERED = "1"
+PYTHONFAULTHANDLER = "1"
+
+# --------------------------
+# Setup Phase: Install system dependencies
+# --------------------------
+[phases.setup]
+aptPkgs = ['libpq-dev', 'python3-dev', 'nodejs', 'npm']
+# You could also add gcc if needed
+nixPkgs = ['python313', 'postgresql_16.dev']
+
+# --------------------------
+# Install Phase: Install Python + frontend dependencies
+# --------------------------
 [phases.install]
-cmd = ["...","npm install --prefix frontend"]
+dependsOn = ['setup']
+cmds = [
+    # Create virtualenv and install Python packages
+    "python -m venv /opt/venv",
+    ". /opt/venv/bin/activate && pip install --upgrade pip",
+    ". /opt/venv/bin/activate && pip install -r requirements.txt",
 
+    # Install frontend packages
+    "npm install --prefix frontend"
+]
+cacheDirectories = [
+    "/root/.cache/pip",          # cache Python packages
+    "frontend/node_modules"      # cache frontend dependencies
+]
+
+# --------------------------
+# Build Phase: Build frontend and collect static files
+# --------------------------
 [phases.build]
-cmd = ["...","npm run build --prefix frontend"]
+dependsOn = ['install']
+cmds = [
+    "npm run build --prefix frontend",
+    ". /opt/venv/bin/activate && python manage.py collectstatic --noinput"
+]
+# Only include the build artifacts in this phase
+onlyIncludeFiles = [
+    "frontend/dist",
+    "staticfiles",
+    "core",
+    "store",
+    "manage.py",
+    "requirements.txt",
+    "core/wsgi.py",
+    "/opt/venv"
+]
 
+# --------------------------
+# Start Phase: Run migrations and start Gunicorn
+# --------------------------
+[start]
+cmd = ". /opt/venv/bin/activate && python manage.py migrate && gunicorn core.wsgi:application --bind 0.0.0.0:8080"
+runImage = "debian:bullseye-slim"
+onlyIncludeFiles = [
+    "frontend/dist",
+    "staticfiles",
+    "core",
+    "store",
+    "manage.py",
+    "requirements.txt",
+    "core/wsgi.py",
+    "/opt/venv"
+]
