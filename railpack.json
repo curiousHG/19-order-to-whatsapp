@@ -1,7 +1,11 @@
 {
   "$schema": "https://schema.railpack.com",
   "steps": {
+    
     "install": {
+      "inputs": [
+        "."
+      ],
       "commands": [
         "python -m venv /app/.venv",
         "/app/.venv/bin/pip install --upgrade pip",
