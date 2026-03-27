@@ -1,0 +1,14 @@
+[phases.install]
+cmds = [
+  "pip install uv",
+  "uv sync --no-dev"
+]
+
+[phases.build]
+cmds = [
+  "cd frontend && npm ci && npm run build",
+  "uv run python manage.py collectstatic --noinput"
+]
+
+[start]
+cmd = "gunicorn core.wsgi --log-file -"

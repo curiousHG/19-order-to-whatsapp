@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import { ListItem, ListItemText, TextField, Select, MenuItem, CardMedia } from "@mui/material";
-import { Box, Typography } from "@material-ui/core";
+import { Box, Typography } from "@mui/material";
 
 // import { TextField, InputField, TextBox } from "@material-ui/core";
 

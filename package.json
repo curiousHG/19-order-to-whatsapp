@@ -1,0 +1,11 @@
+{
+  "name": "ecommerce-dev",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently --kill-others --names \"django,vite\" --prefix-colors \"blue,green\" \"uv run python manage.py runserver\" \"cd frontend && npm run dev\"",
+    "install:frontend": "cd frontend && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}

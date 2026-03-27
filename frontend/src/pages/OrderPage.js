@@ -1,5 +1,5 @@
 import React, { useEffect, useState, lazy } from "react";
-import { Typography, Button, Box, Grid } from "@material-ui/core";
+import { Typography, Button, Box, Grid } from "@mui/material";
 import { Link } from "react-router-dom";
 const LazyCategoryList = lazy(() => import("../components/CategoryList"));
 import axios from "axios";
