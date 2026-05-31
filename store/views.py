@@ -1,16 +1,21 @@
+import logging
+
+from django.db import IntegrityError, transaction
 from django.shortcuts import render
-from django.http import JsonResponse
-from .models import Category, Product, Order, Customer
+from rest_framework import generics, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.exceptions import ValidationError as DRFValidationError
+
+from .models import Category, Customer, Order, Product
 from .serializers import (
     ProductSerializer,
     CategorySerializer,
     OrderSerializer,
     CustomerSerializer,
 )
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import generics, viewsets, status
-from rest_framework.decorators import api_view
+
+logger = logging.getLogger(__name__)
 
 
 def all_products(request):
@@ -38,7 +43,6 @@ class ProductsView(APIView):
             }
             for detail in Product.objects.all()
         ]
-        # print( Product.objects.all()[1].__dict__)
         return Response(details)
 
 
@@ -46,16 +50,13 @@ class CategoryListView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
-    # if category/atta then return products with category atta
     def get(self, request, category=None, format=None):
         if category:
-            # category = category.upper()
             products = Product.objects.filter(category__name=category)
             serializer = ProductSerializer(products, many=True)
             return Response(serializer.data)
         return self.list(request)
-    
-    # this is post request to update the prices of all products in a category
+
     def post(self, request, format=None):
         pass
 
@@ -64,29 +65,54 @@ class CustomerView(generics.ListCreateAPIView):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
 
-    # create a post method to create a new customer
     def post(self, request, format=None):
         serializer = CustomerSerializer(data=request.data)
-        if serializer.is_valid():
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
             serializer.save()
+        except IntegrityError:
+            logger.exception("IntegrityError creating customer")
             return Response(
-                {"message": "customer created"}, status=status.HTTP_201_CREATED
+                {"detail": "Could not save customer due to a database error."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"message": "customer created"}, status=status.HTTP_201_CREATED
+        )
 
 
 class OrderView(generics.ListCreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
-    # create a post method to create a new order
-    # print the request data
     def post(self, request, format=None):
-
         serializer = OrderSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            with transaction.atomic():
+                serializer.save()
+        except DRFValidationError as e:
+            # raised from OrderSerializer.create() when product names don't exist
+            return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
+        except IntegrityError:
+            logger.exception("IntegrityError creating order")
             return Response(
-                {"message": "order created"}, status=status.HTTP_201_CREATED
+                {
+                    "detail": (
+                        "Could not save your order due to a database error. "
+                        "Please try again in a moment."
+                    )
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            logger.exception("Unexpected error creating order")
+            return Response(
+                {"detail": "Unexpected error processing the order. Please try again."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+        return Response(
+            {"message": "order created"}, status=status.HTTP_201_CREATED
+        )

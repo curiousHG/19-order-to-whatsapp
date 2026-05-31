@@ -37,7 +37,7 @@ export const useCartStore = create<CartState>()(
   )
 )
 
-// Unit options keyed by the product's base unit
+// Unit options keyed by the canonical base unit
 export const UNIT_OPTIONS: Record<string, string[]> = {
   KG: ['KG', 'gm'],
   LTR: ['LTR', 'mL'],
@@ -45,8 +45,25 @@ export const UNIT_OPTIONS: Record<string, string[]> = {
   Pc: ['Pc'],
 }
 
+// Map the various capitalisations / spellings that come back from the DB
+// onto their canonical key in UNIT_OPTIONS.
+const UNIT_ALIASES: Record<string, string> = {
+  kg: 'KG', KG: 'KG', Kg: 'KG', kG: 'KG', kilogram: 'KG', Kilogram: 'KG',
+  ltr: 'LTR', LTR: 'LTR', Ltr: 'LTR', l: 'LTR', L: 'LTR', liter: 'LTR', Liter: 'LTR',
+  gm: 'gm', GM: 'gm', Gm: 'gm', g: 'gm', gram: 'gm', Gram: 'gm',
+  pc: 'Pc', Pc: 'Pc', PC: 'Pc', pcs: 'Pc', Pcs: 'Pc', piece: 'Pc', Piece: 'Pc',
+  ml: 'LTR', mL: 'LTR', ML: 'LTR',  // mL alone → treat as LTR base
+}
+
 export function getUnitsFor(baseUnit: string): string[] {
-  return UNIT_OPTIONS[baseUnit] ?? [baseUnit]
+  const canonical = UNIT_ALIASES[baseUnit] ?? baseUnit
+  return UNIT_OPTIONS[canonical] ?? [baseUnit]
+}
+
+// Map a raw unit string ("Kg", "kg", "KG", "L", "GM", …) to its canonical form
+// ("KG", "LTR", "gm", "Pc"). Returns the raw string if no alias matches.
+export function canonicalizeUnit(raw: string): string {
+  return UNIT_ALIASES[raw] ?? raw
 }
 
 export function buildWhatsAppUrl(

@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Full-stack ecommerce app for a single local shop ("19onlineshop"). Customers browse products, build a cart, and place an order — which is delivered to the shop owner as a pre-filled **WhatsApp message** rather than going through any payment gateway. There is no customer login; each order also creates a fresh `Customer` row.
+Full-stack ecommerce app for a single local shop ("Khari Baoli / 19onlineshop"). Customers browse products, build a cart, and place an order — which is delivered to the shop owner as a pre-filled **WhatsApp message** rather than going through any payment gateway. There is no customer login; each order creates a fresh `Customer` row.
 
-Two deployments:
-- **Backend** — Django + DRF on Railway, serving the JSON API at `/store/*`.
-- **Frontend** — Next.js 16 statically exported (`output: "export"`) and served by the same Django/Whitenoise process; same origin as the API in prod.
+One Railway service:
+- **Backend** — Django + DRF, serving the JSON API at `/store/*`, admin at `/admin/`.
+- **Frontend** — Vite + React 19 + TypeScript SPA in `web/`, built to `web/dist/` and served by the same Django process via Whitenoise (assets) + a catch-all view in `core/urls.py` that returns `index.html` so React Router handles client-side routes.
 
 The repo root has `dev.py`, a stdlib-only Python runner (invoked via `uv run dev.py …`) that starts both dev servers together. The frontend has its own `package.json` inside `web/`; there is no root `package.json`.
 
@@ -25,12 +25,11 @@ uv run python manage.py migrate
 ### Dev (both servers, one command)
 
 ```bash
-uv run dev.py dev      # Django :8000 + Next.js :3000 (split-port HMR)
+uv run dev.py dev      # Django :8000 + Vite :3000 (split-port HMR)
 uv run dev.py mobile   # same, bound to 0.0.0.0 for LAN testing
-uv run dev.py prod     # single-origin: next build + collectstatic + gunicorn on :8000
+uv run dev.py prod     # vite build + collectstatic + gunicorn on :8000
+uv run dev.py deploy   # railway up --detach (uses ~/.railway-token)
 ```
-
-`dev.py` is a stdlib-only Python runner that replaces the old root `package.json` (no root `node_modules` needed).
 
 ### Backend only
 
@@ -46,8 +45,8 @@ uv add <package>     # add a dep (updates pyproject.toml + uv.lock)
 
 ```bash
 cd web
-npm run dev          # Next.js dev server on :3000
-npm run build        # production build
+npm run dev          # Vite dev server on :3000
+npm run build        # production build → dist/
 npm run lint         # ESLint
 ```
 
@@ -56,20 +55,18 @@ npm run lint         # ESLint
 `nixpacks.toml` does, in order:
 1. `pip install uv && uv sync --no-dev` — Python deps.
 2. `cd web && npm ci` — frontend deps.
-3. `cd web && npm run build` — Next.js static export → `web/out/` (because `next.config.ts` sets `output: "export"` + `trailingSlash: true`).
-4. `uv run python manage.py collectstatic --noinput` — folds `web/out/` (added via `STATICFILES_DIRS`) into `staticfiles/`.
+3. `cd web && npm run build` — Vite production build → `web/dist/`.
+4. `uv run python manage.py collectstatic --noinput` — folds `web/dist/` (added via `STATICFILES_DIRS`) into `staticfiles/`.
 5. Start: `gunicorn core.wsgi`.
 
-Whitenoise serves `/` from the static bundle (`WHITENOISE_INDEX_FILE = True` makes `/checkout/` resolve to `out/checkout/index.html`, etc.). Django keeps owning `/store/*` and `/admin/`. The whole app runs on one origin → no CORS in prod, no second deployment to coordinate.
-
-There is no Vercel deployment. The `web/vercel.json` file has been removed.
+Whitenoise serves the hashed asset URLs (`/assets/*.js`, `/assets/*.css`) and the favicon. Any URL not matched by `/admin/`, `/store/`, `/static/`, or `/media/` falls through to a tiny catch-all view in `core/urls.py` that returns `web/dist/index.html` so React Router takes over (handles `/`, `/checkout`, future routes). One origin, no CORS, no second deployment.
 
 ## Architecture
 
 ### Backend (`store/`)
 
 **Models** (`store/models.py`):
-- `Category` — `name`, `slug`
+- `Category` — `name`, `slug`, optional `image` (Cloudinary)
 - `Product` — belongs to `Category`. Fields: `name`, `slug`, `description`, `price` (decimal, 0 places), `quantity`, `available`, `image` (Cloudinary), `unit` (one of `KG`, `LTR`, `gm`, `Pc` via `Product.QuantityDenomination`).
 - `Customer` — `name`, `address`, `date_created`. A new row is created for **every order** (no dedupe by name/phone).
 - `Order` — FK to `Customer`, plus `products` as a **denormalized `JSONField`** holding `[{"product": <name>, "quantity": <str>}, ...]`.
@@ -79,7 +76,7 @@ There is no Vercel deployment. The `web/vercel.json` file has been removed.
 
 **Views** (`store/views.py`) — DRF class-based views, all `AllowAny`:
 - `AllCategories.GET` — flat list of categories `[{id, name}]`
-- `CategoryListView` — at `/store/category/` returns categories with nested products; at `/store/category/<name>` returns products in that category
+- `CategoryListView` — at `/store/category/` returns categories with nested products; at `/store/category/<name>/` returns products in that category
 - `ProductsView.GET` — flat list of all products with id/name/category/price
 - `OrderView.POST` — creates `Customer` + `Order` + `OrderItem`s in one call via `OrderSerializer.create()`
 - `CustomerView.POST` — creates a `Customer` directly (used independently; the order flow no longer needs this since `OrderSerializer` creates the customer inline)
@@ -87,15 +84,15 @@ There is no Vercel deployment. The `web/vercel.json` file has been removed.
 **Serializers** (`store/serializers.py`):
 - `OrderSerializer` is the interesting one — accepts a nested `customer` object and a `products` list of `{product: <name>, quantity: <str>}`, then in `create()`: pops both, creates the `Customer`, creates the `Order`, looks up each `Product` by name, creates an `OrderItem`, and finally writes the snapshot back to `order.products` as JSON. Note: lookup is by **product name string**, so renaming a product breaks in-flight orders.
 
-**URLs**:
-- `core/urls.py` mounts `store.urls` under `/store/` (and `admin/`). There is **no Django frontend route** — Next.js owns the UI.
-- `store/urls.py` exposes:
-  - `/store/allcategories` — flat category list
-  - `/store/category/` — categories with nested products
-  - `/store/category/<name>` — products for one category
-  - `/store/products/` — flat product list
-  - `/store/order` (and `/store/order/`) — create order
-  - `/store/customer` — create customer
+**URLs** (`store/urls.py`) — Django convention, one canonical pattern per endpoint, all with trailing slash:
+- `/store/allcategories/` — flat category list
+- `/store/category/` — categories with nested products
+- `/store/category/<name>/` — products for one category
+- `/store/products/` — flat product list
+- `/store/order/` — create order
+- `/store/customer/` — create customer
+
+`core/urls.py` mounts `store.urls` at `/store/`, `admin.site.urls` at `/admin/`, and a `re_path(r"^(?!admin/|store/|static/|media/).*$", spa)` catch-all that returns the SPA's `index.html` for everything else.
 
 ### Database
 
@@ -104,38 +101,38 @@ There is no Vercel deployment. The `web/vercel.json` file has been removed.
 
 ### Media & static
 
-- **Product images** — uploaded via Django admin, stored on **Cloudinary** (`DEFAULT_FILE_STORAGE = cloudinary_storage.storage.MediaCloudinaryStorage`). `CLOUDINARY_URL` env var.
+- **Product / category images** — uploaded via Django admin, stored on **Cloudinary** in non-DEBUG environments (`STORAGES["default"]` → `cloudinary_storage.storage.MediaCloudinaryStorage`). Local dev uses `FileSystemStorage` under `media/`.
 - **Static** — Whitenoise with `CompressedManifestStaticFilesStorage` in prod, plain storage in dev.
 
-## Frontend (`web/` — Next.js 16, TypeScript, statically exported)
-
-> ⚠️ `web/CLAUDE.md` (which inherits from `web/AGENTS.md`) warns: **"This is NOT the Next.js you know"** — there are breaking changes in 16 vs older versions. Consult `web/node_modules/next/dist/docs/` before writing Next.js code rather than relying on training-data conventions.
+## Frontend (`web/` — Vite SPA)
 
 ### Stack
 
-- **Next.js 16** App Router — Server Components fetch data, Client Components handle interactivity
-- **React 19**
+- **Vite 7** + **React 19** + **TypeScript** — SPA with `BrowserRouter` from `react-router-dom`
 - **Zustand** (`zustand` v5) — cart state, persisted to `localStorage` key `"cart"`
-- **shadcn/ui + Tailwind v4** — CSS-based config in `app/globals.css` (no `tailwind.config.ts`)
-- **SWR** — client-side data fetching where used
+- **shadcn/ui + Tailwind v4** — CSS-based config in `src/globals.css` (no `tailwind.config.ts`); uses `@tailwindcss/vite` plugin
+- **SWR** — client-side data fetching (the home page loads categories with `useSWR`)
 - **@base-ui/react** — primitives layered under shadcn
+- **lucide-react** — icons
 - **Theme** — green primary (`oklch(0.627 0.175 149.2)`), amber accent (`oklch(0.769 0.188 70.1)`)
 
 ### Key files
 
-- `lib/types.ts` — shared TypeScript interfaces matching the Django serializers
-- `lib/api.ts` — `getCategories()`, `postOrder()` — uses relative URLs (`/store/...`); the Next dev server proxies them to Django on :8000 via `rewrites()` in `next.config.ts`, and in prod the static bundle hits the same origin Django is served from
-- `lib/cart-store.ts` — Zustand store + `getUnitsFor()` helper + `buildWhatsAppUrl()` (constructs the `wa.me/...?text=...` link from the cart)
-- `components/store/StoreView.tsx` — main interactive store (client component)
-- `components/store/ProductRow.tsx` — quantity input + unit selector per product
-- `components/cart/CartDrawer.tsx` — cart sheet with "Place Order" button
-- `app/page.tsx` — client component that fetches categories via SWR (must be client-side because the app is statically exported)
-- `app/checkout/page.tsx` — review + name/address form → submit → WhatsApp redirect
+- `src/main.tsx` — entry point. Mounts `<BrowserRouter>` with two routes: `/` → `HomePage`, `/checkout` → `CheckoutPage`, `*` → `HomePage`.
+- `src/lib/types.ts` — shared TypeScript interfaces matching the Django serializers.
+- `src/lib/api.ts` — `getCategories()`, `postOrder()` — uses relative URLs (`/store/category/`, `/store/order/`). Vite's `server.proxy` forwards them to Django on `:8000` in dev; prod is single-origin so the same URLs hit Django directly.
+- `src/lib/cart-store.ts` — Zustand store + `getUnitsFor()` + `canonicalizeUnit()` + `buildWhatsAppUrl()`.
+- `src/components/layout/Header.tsx` — sticky green header with the "19" sun emblem + "Khari Baoli" wordmark, search button, and cart-icon-with-badge.
+- `src/components/store/StoreView.tsx` — main interactive store (category chips/sidebar, paginated product list, fullscreen search modal, hero header per category).
+- `src/components/store/ProductRow.tsx` — product row with quantity stepper (`[− qty +]`) and a tap-to-cycle unit pill.
+- `src/components/cart/CartDrawer.tsx` — slide-in cart with "Place Order" → `navigate('/checkout')`.
+- `src/pages/HomePage.tsx` — calls `useSWR('categories', getCategories)`, shows loading spinner / error / `<StoreView>`.
+- `src/pages/CheckoutPage.tsx` — order summary + name/address form → POST `/store/order/` → `window.location` to `wa.me/...` URL.
 
 ### Cart → order → WhatsApp flow
 
-1. User adjusts quantities on `StoreView` — Zustand updates `cart` (persisted).
-2. On checkout, `postOrder()` POSTs `{customer, products}` to `/store/order` — Django creates `Customer` + `Order` + `OrderItem`s.
+1. User adjusts quantities on `StoreView` — Zustand updates `cart` (persisted to localStorage).
+2. On checkout, `postOrder()` POSTs `{customer, products}` to `/store/order/` — Django creates `Customer` + `Order` + `OrderItem`s.
 3. Frontend builds a WhatsApp URL via `buildWhatsAppUrl()` and redirects the browser. The shop owner receives a formatted message and confirms the order out-of-band.
 
 ### Unit options per product
@@ -147,11 +144,11 @@ gm  → [gm, KG]
 Pc  → [Pc]
 ```
 
-These come from `getUnitsFor()` in `lib/cart-store.ts`. The unit chosen at cart time becomes part of the `quantity` string sent to Django (e.g. `"2 KG"`).
+These come from `getUnitsFor()` in `src/lib/cart-store.ts`. `canonicalizeUnit()` maps casing variants (`"Kg"`, `"kg"`, `"L"`, `"GM"`, …) onto the canonical keys so cycling and display stay consistent across data that may have non-canonical units stored. The unit chosen at cart time becomes part of the `quantity` string sent to Django (e.g. `"2 KG"`).
 
 ### Env vars
 
-The frontend doesn't need any. `lib/api.ts` uses relative URLs; the Next dev server's `rewrites()` (in `next.config.ts`) proxies `/store/*`, `/admin/*`, and `/media/*` to `http://localhost:8000` during dev, and prod is single-origin so the same URLs hit Django directly.
+The frontend doesn't need any. `lib/api.ts` uses relative URLs. In dev, `vite.config.ts`'s `server.proxy` forwards `/store/*`, `/admin/*`, and `/media/*` to `http://localhost:8000` verbatim (trailing slashes preserved — unlike Next's rewrites which strip them). In prod, Django serves both the SPA and the API at one origin.
 
 ## Tests
 
@@ -175,35 +172,41 @@ There are no frontend tests yet.
 - **DRF perms are wide open** — `AllowAny` everywhere. CORS is `CORS_ORIGIN_ALLOW_ALL = True`. There is no auth on the storefront; admin uses Django's standard auth at `/admin/`.
 - **Time zone** — `TIME_ZONE = "Asia/Kolkata"`. Don't change without checking how `Order.order_date` is rendered.
 - **`uv` only** — Python deps are in `pyproject.toml` + `uv.lock`. There is no `requirements.txt`. Use `uv add <pkg>`, never `pip install`.
-- **Next.js 16 is new** — see `web/AGENTS.md`. APIs may differ from older docs; check `web/node_modules/next/dist/docs/` first.
+- **Django URL convention** — every `store/` endpoint has a single trailing-slash form; the frontend calls them with the slash (`/store/category/`). Vite's proxy preserves the slash, so no `APPEND_SLASH` redirect loops.
 
 ## Key config files
 
-- `core/settings.py` — DB switch on `DEBUG`, Cloudinary storage, `TIME_ZONE = "Asia/Kolkata"`, `ALLOWED_HOSTS`, CORS/CSRF origins
-- `core/urls.py` — mounts `store/` and `admin/`; nothing else
-- `store/urls.py` — REST endpoints
-- `nixpacks.toml` — Railway build (`uv sync` + `collectstatic`)
-- `web/next.config.ts`, `web/components.json`, `web/postcss.config.mjs` — Next/shadcn/Tailwind config
-- `.env` (root, gitignored) — `SECRET_KEY`, `DEBUG`, DB creds, `CLOUDINARY_URL`
+- `core/settings.py` — DB switch on `DEBUG`, Cloudinary storage, `TIME_ZONE = "Asia/Kolkata"`, `ALLOWED_HOSTS`, CORS/CSRF origins, `STATICFILES_DIRS = [web/dist]`.
+- `core/urls.py` — mounts `store/` + `admin/` + SPA catch-all `re_path`.
+- `store/urls.py` — REST endpoints (single trailing-slash form each).
+- `nixpacks.toml` — Railway build (Node + Python deps → vite build → collectstatic → gunicorn).
+- `web/vite.config.ts` — port 3000, `server.proxy` to Django, `@` alias, `build.outDir = dist`.
+- `web/components.json` — shadcn/ui config.
+- `.env` (root, gitignored) — `SECRET_KEY`, `DEBUG`, DB creds, `CLOUDINARY_URL`.
+- `~/.railway-token` (outside repo) — Railway API token used by `dev.py deploy`.
 
 ## Project layout
 
 ```
-core/                  Django project (settings, root urls, wsgi/asgi)
+core/                  Django project (settings, root urls + SPA catch-all, wsgi/asgi)
 store/                 Django app: models, views, serializers, admin, migrations, tests
   models.py            Category, Product, Customer, Order, OrderItem
   views.py             DRF class-based views
   serializers.py       OrderSerializer.create() does the heavy lifting
-  urls.py              /store/* endpoints
-web/                   Next.js 16 frontend
-  app/                 App Router (page.tsx, checkout/, layout.tsx, globals.css)
-  components/          cart/, checkout/, layout/, store/, ui/
-  lib/                 api.ts, cart-store.ts, types.ts, utils.ts
-  CLAUDE.md / AGENTS.md  Next.js 16 caveat
-media/                 local-only uploads (Cloudinary is used in prod)
-staticfiles/           collectstatic output (deploy artifact)
+  urls.py              /store/* endpoints (Django convention, trailing slash)
+web/                   Vite SPA
+  src/
+    main.tsx           BrowserRouter + routes
+    pages/             HomePage, CheckoutPage
+    components/        layout/, store/, cart/, ui/
+    lib/               api.ts, cart-store.ts, types.ts, utils.ts
+    globals.css        Tailwind v4 + shadcn theme tokens
+  vite.config.ts       proxy /store, /admin, /media → :8000
+  index.html           SPA shell
+media/                 local-only uploads (Cloudinary used in prod)
+staticfiles/           collectstatic output (deploy artifact, gitignored)
 nixpacks.toml          Railway build
-package.json           root dev scripts (concurrently)
+dev.py                 Single-file dev runner (stdlib only)
 pyproject.toml         Python deps (uv)
 db.sqlite3             dev DB
 ```

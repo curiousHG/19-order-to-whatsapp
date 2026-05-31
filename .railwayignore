@@ -5,8 +5,9 @@
 *.pyc
 node_modules/
 web/node_modules/
-web/.next/
-web/out/
+web/dist/
+web/.vite/
+web/tsconfig.tsbuildinfo
 staticfiles/
 db.sqlite3
 .DS_Store

@@ -1,25 +1,23 @@
-'use client'
-
-import { useRouter } from 'next/navigation'
-import { ShoppingCart, Trash2, MessageCircle } from 'lucide-react'
+import { useNavigate } from "react-router-dom";
+import { ShoppingCart, Trash2, MessageCircle } from "lucide-react";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-} from '@/components/ui/sheet'
-import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { useCartStore } from '@/lib/cart-store'
+} from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useCartStore } from "@/lib/cart-store";
 
 interface CartDrawerProps {
-  open: boolean
-  onClose: () => void
+  open: boolean;
+  onClose: () => void;
 }
 
 export function CartDrawer({ open, onClose }: CartDrawerProps) {
-  const router = useRouter()
-  const { items, removeItem, clearCart } = useCartStore()
+  const navigate = useNavigate();
+  const { items, removeItem, clearCart } = useCartStore();
 
   return (
     <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
@@ -30,7 +28,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
             Your Order
             {items.length > 0 && (
               <span className="text-sm font-normal text-muted-foreground">
-                ({items.length} {items.length === 1 ? 'item' : 'items'})
+                ({items.length} {items.length === 1 ? "item" : "items"})
               </span>
             )}
           </SheetTitle>
@@ -86,8 +84,8 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
               <Button
                 className="flex-1 bg-green-600 hover:bg-green-700 text-white gap-2"
                 onClick={() => {
-                  onClose()
-                  router.push('/checkout')
+                  onClose();
+                  navigate("/checkout");
                 }}
               >
                 <MessageCircle className="h-4 w-4" />
@@ -98,5 +96,5 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
         )}
       </SheetContent>
     </Sheet>
-  )
+  );
 }

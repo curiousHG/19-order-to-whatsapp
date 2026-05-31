@@ -3,13 +3,14 @@
 # requires-python = ">=3.11"
 # dependencies = []
 # ///
-"""Dev runner — replaces the root package.json scripts.
+"""Dev runner for the Vite SPA (web/) + Django backend.
 
 Usage:
-    uv run dev.py dev          # Django :8000 + Next :3000 (split-port HMR)
+    uv run dev.py dev          # Django :8000 + Vite :3000 (split-port HMR)
     uv run dev.py mobile       # same, bound to 0.0.0.0 for LAN testing
-    uv run dev.py prod         # single-origin: next build + collectstatic + gunicorn
+    uv run dev.py prod         # vite build + collectstatic + gunicorn on :8000
     uv run dev.py install-web  # install web/ npm deps
+    uv run dev.py deploy       # railway up --detach (uses ~/.railway-token)
 """
 from __future__ import annotations
 
@@ -101,18 +102,18 @@ def run_sequential(steps: list[Proc]) -> int:
 
 
 def cmd_dev(host: str = "127.0.0.1") -> int:
-    next_cmd = ["npm", "run", "dev", "--"]
+    vite_cmd = ["npm", "run", "dev", "--"]
     if host != "127.0.0.1":
-        next_cmd += ["--hostname", host]
+        vite_cmd += ["--host", host]
     return run_concurrent([
         Proc("django", "blue", ["uv", "run", "python", "manage.py", "runserver", f"{host}:8000"]),
-        Proc("nextjs", "green", next_cmd, cwd="web"),
+        Proc("vite", "green", vite_cmd, cwd="web"),
     ])
 
 
 def cmd_prod() -> int:
     return run_sequential([
-        Proc("build",   "green", ["npm", "run", "build"], cwd="web", env={"NEXT_PUBLIC_API_URL": ""}),
+        Proc("build",   "green", ["npm", "run", "build"], cwd="web"),
         Proc("collect", "blue",  ["uv", "run", "python", "manage.py", "collectstatic", "--noinput", "--clear"]),
         Proc("serve",   "blue",  ["uv", "run", "gunicorn", "core.wsgi", "--bind", "127.0.0.1:8000"], env={"DEBUG": "False"}),
     ])
@@ -122,13 +123,36 @@ def cmd_install_web() -> int:
     return subprocess.call(["npm", "install"], cwd="web")
 
 
+def cmd_deploy() -> int:
+    """Deploy to the Railway service this directory is `railway link`ed to.
+
+    Reads the token from ~/.railway-token (kept out of the repo). Project /
+    environment / service IDs come from the prior `railway link` saved in
+    ~/.railway/config.json — re-run `railway link` to switch targets.
+    """
+    token_path = os.path.expanduser("~/.railway-token")
+    if not os.path.isfile(token_path):
+        print(
+            f"{COLORS['red']}Missing {token_path}{COLORS['reset']}\n"
+            "Save your Railway account token there first:\n"
+            "  echo 'YOUR_TOKEN' > ~/.railway-token && chmod 600 ~/.railway-token",
+            file=sys.stderr,
+        )
+        return 1
+    env = os.environ.copy()
+    env["RAILWAY_API_TOKEN"] = open(token_path).read().strip()
+    print(f"{COLORS['blue']}[deploy]{COLORS['reset']} $ railway up --detach", flush=True)
+    return subprocess.call(["railway", "up", "--detach"], env=env)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Dev runner for the ecommerce repo")
     sub = parser.add_subparsers(dest="cmd", required=True)
-    sub.add_parser("dev", help="Django :8000 + Next :3000 (split-port HMR)")
+    sub.add_parser("dev", help="Django :8000 + Vite :3000 (split-port HMR)")
     sub.add_parser("mobile", help="same as dev, bound to 0.0.0.0 for LAN testing")
-    sub.add_parser("prod", help="build Next + collectstatic + gunicorn on :8000")
+    sub.add_parser("prod", help="vite build + collectstatic + gunicorn on :8000")
     sub.add_parser("install-web", help="run npm install in web/")
+    sub.add_parser("deploy", help="railway up --detach to the linked service")
     args = parser.parse_args()
 
     return {
@@ -136,6 +160,7 @@ def main() -> int:
         "mobile": lambda: cmd_dev("0.0.0.0"),
         "prod": cmd_prod,
         "install-web": cmd_install_web,
+        "deploy": cmd_deploy,
     }[args.cmd]()
 
 

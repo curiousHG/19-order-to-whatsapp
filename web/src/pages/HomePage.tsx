@@ -1,18 +1,16 @@
-'use client'
+import useSWR from "swr";
+import { getCategories } from "@/lib/api";
+import { StoreView } from "@/components/store/StoreView";
 
-import useSWR from 'swr'
-import { getCategories } from '@/lib/api'
-import { StoreView } from '@/components/store/StoreView'
-
-export default function Page() {
-  const { data: categories, error } = useSWR('categories', getCategories)
+export function HomePage() {
+  const { data: categories, error } = useSWR("categories", getCategories);
 
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-sm text-muted-foreground">Failed to load products.</p>
       </div>
-    )
+    );
   }
 
   if (!categories) {
@@ -23,8 +21,8 @@ export default function Page() {
           <p className="text-sm text-muted-foreground">Loading products…</p>
         </div>
       </div>
-    )
+    );
   }
 
-  return <StoreView categories={categories} />
+  return <StoreView categories={categories} />;
 }

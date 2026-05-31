@@ -13,7 +13,7 @@ from django.conf import settings
 from pathlib import Path
 import os
 from dotenv import load_dotenv, find_dotenv
-env = load_dotenv(find_dotenv(), override=True)
+env = load_dotenv(find_dotenv(), override=False)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -65,6 +65,11 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.AllowAny",
     ],
+    # No auth on the storefront. Without this, DRF's default
+    # SessionAuthentication would CSRF-check POSTs whenever a session cookie
+    # is present (e.g. after an admin login in the same browser), causing
+    # 403 Forbidden on /store/order/.
+    "DEFAULT_AUTHENTICATION_CLASSES": [],
 }
 
 MIDDLEWARE = [
@@ -173,13 +178,11 @@ USE_TZ = True
 # else:
     # Production: Use compressed manifest storage
 STORAGES = {
-    "default": {
-        "BACKEND": (
-            "django.core.files.storage.FileSystemStorage"
-            if DEBUG
-            else "cloudinary_storage.storage.MediaCloudinaryStorage"
-        )
-    },
+    # Always Cloudinary for media — so a local dev DB seeded with a copy of
+    # prod sees the same image URLs as prod, and locally-uploaded images
+    # land in the same place too (no /media/ 404s from missing local files).
+    # Requires CLOUDINARY_URL in .env.
+    "default": {"BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage"},
     "staticfiles": {
         "BACKEND": (
             "django.contrib.staticfiles.storage.StaticFilesStorage"
@@ -192,9 +195,11 @@ STORAGES = {
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATIC_URL = "static/"
 
-# Serve the Next.js static export (web/out/) at the site root via Whitenoise.
-# `npm run build` produces web/out/; collectstatic pulls it into STATIC_ROOT.
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "web", "out")]
+# Serve the Vite SPA build (web/dist/) at the site root via Whitenoise.
+# `npm run build` in web/ produces web/dist/; collectstatic pulls it into
+# STATIC_ROOT. The SPA's index.html is served at /, and the catch-all view
+# in core/urls.py serves it for any unmatched client-side route.
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "web", "dist")]
 WHITENOISE_ROOT = os.path.join(BASE_DIR, "staticfiles")
 WHITENOISE_INDEX_FILE = True
 

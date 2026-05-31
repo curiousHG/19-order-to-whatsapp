@@ -6,15 +6,15 @@ Live: https://www.19onlineshop.com
 
 ## Stack
 
-- **Backend**: Django 3 + Django REST Framework, Cloudinary for product images, PostgreSQL in prod / SQLite in dev.
-- **Frontend**: Next.js 16 (App Router, React 19, TypeScript) statically exported, Zustand for cart state, shadcn/ui + Tailwind v4.
-- **Deployment**: single Railway service — Django serves the API at `/store/*` and the exported Next.js build at `/`.
+- **Backend**: Django 5.2 LTS + Django REST Framework, Cloudinary for product images, PostgreSQL in prod / SQLite in dev.
+- **Frontend**: Vite + React 19 + TypeScript SPA, React Router for routes, Zustand for cart state (persisted to localStorage), shadcn/ui + Tailwind v4.
+- **Deployment**: single Railway service — Django serves the API at `/store/*`, the admin at `/admin/`, and the built SPA (`web/dist/`) at everything else.
 - **Tooling**: `uv` for Python deps, `npm` for the frontend, `dev.py` (stdlib-only) to run both dev servers from the repo root.
 
 ## Prerequisites
 
 - [uv](https://docs.astral.sh/uv/getting-started/installation/)
-- Node.js 18+ and npm
+- Node.js 20+ and npm
 
 ## First-time setup
 
@@ -32,7 +32,7 @@ DEBUG=True
 
 For production builds, also add `DB_NAME`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`, and `CLOUDINARY_URL`.
 
-No frontend env file is needed: the Next dev server proxies `/store/*`, `/admin/*`, and `/media/*` to Django on `:8000` (see `rewrites()` in `web/next.config.ts`), so the same relative URLs work in both dev and prod.
+No frontend env file is needed: the Vite dev server proxies `/store/*`, `/admin/*`, and `/media/*` to Django on `:8000` (see `server.proxy` in `web/vite.config.ts`), so the same relative URLs work in both dev and prod.
 
 Apply migrations:
 
@@ -49,7 +49,7 @@ uv run dev.py dev
 Starts both servers in one terminal:
 
 - Django (API) → http://localhost:8000
-- Next.js (UI) → http://localhost:3000 ← open this
+- Vite (UI)   → http://localhost:3000 ← open this
 
 Stop with Ctrl+C; both processes shut down together.
 
@@ -67,7 +67,7 @@ Binds both servers to `0.0.0.0` so you can hit them from your phone on the same 
 uv run dev.py prod
 ```
 
-Builds the Next.js static export, runs `collectstatic`, then serves everything via gunicorn on http://localhost:8000 — matches what Railway runs in production.
+Builds the SPA, runs `collectstatic`, then serves everything via gunicorn on http://localhost:8000 — matches what Railway runs in production.
 
 ### Running servers individually
 
@@ -90,13 +90,13 @@ uv run python manage.py test store.tests
 uv add <package>          # add a Python dep
 
 # Frontend
-cd web && npm run build   # production build
+cd web && npm run build   # production build → web/dist/
 cd web && npm run lint    # ESLint
 ```
 
 ## Deployment (single Railway service)
 
-`nixpacks.toml` installs Node + Python deps, runs `cd web && npm run build` to produce `web/out/` (Next.js static export), then `collectstatic` to fold the export into `staticfiles/`. Whitenoise serves the static bundle at `/` (with `WHITENOISE_INDEX_FILE = True` so directory URLs resolve to `index.html`); Django keeps owning `/store/*` and `/admin/`.
+`nixpacks.toml` installs Node + Python deps, runs `cd web && npm run build` to produce `web/dist/` (Vite SPA bundle), then `collectstatic` to fold the bundle into `staticfiles/`. Whitenoise serves the static assets at the root; Django's catch-all view in `core/urls.py` serves `web/dist/index.html` for any client-side route so React Router can take over. Django keeps owning `/store/*` and `/admin/`.
 
 Required Railway env vars:
 
@@ -112,13 +112,18 @@ To preview a branch without touching prod, add a second service in the same Rail
 ## Project layout
 
 ```
-core/      Django project (settings, root urls)
+core/      Django project (settings, root urls, SPA catch-all view)
 store/     Django app — models, views, serializers, migrations
-web/       Next.js frontend
-  app/         App Router pages (page.tsx, checkout/, layout.tsx)
-  components/  cart/, checkout/, layout/, store/, ui/
-  lib/         api.ts, cart-store.ts, types.ts, utils.ts
-dev.py         Single-file dev runner (replaces root package.json)
+web/       Vite SPA
+  src/
+    main.tsx          entry point (BrowserRouter + routes)
+    pages/            HomePage, CheckoutPage
+    components/       layout/, store/, cart/, ui/
+    lib/              api.ts, cart-store.ts, types.ts, utils.ts
+    globals.css       Tailwind v4 + shadcn theme
+  vite.config.ts      proxy /store, /admin, /media → :8000
+  index.html          SPA shell
+dev.py         Single-file dev runner (stdlib only)
 nixpacks.toml  Railway build config
 pyproject.toml Python deps (managed by uv)
 ```

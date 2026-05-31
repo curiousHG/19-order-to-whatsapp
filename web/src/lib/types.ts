@@ -13,6 +13,7 @@ export interface Category {
   id: number
   name: string
   slug: string
+  image: string | null
   products: Product[]
 }
 
@@ -29,7 +30,7 @@ export interface OrderRequest {
     address: string
   }
   products: Array<{
-    product: string
+    productId: number
     quantity: string
   }>
 }
