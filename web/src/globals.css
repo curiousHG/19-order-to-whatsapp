@@ -112,3 +112,35 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* ── Loader animations: sun rays pulsing out + amber bg glow ───── */
+@keyframes sun-rays-pulse {
+  0%, 100% { transform: scale(0.85); opacity: 0.55; }
+  50%      { transform: scale(1.15); opacity: 1; }
+}
+
+@keyframes sun-disc-breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.06); }
+}
+
+@keyframes loader-bg-glow {
+  0%, 100% { background-color: #fffbeb; /* amber-50 */ }
+  50%      { background-color: #fde68a; /* amber-200 */ }
+}
+
+.animate-sun-rays-pulse {
+  animation: sun-rays-pulse 1.6s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.animate-sun-disc-breathe {
+  animation: sun-disc-breathe 2.4s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.animate-loader-bg-glow {
+  animation: loader-bg-glow 2.6s ease-in-out infinite;
+}

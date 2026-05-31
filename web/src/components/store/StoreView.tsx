@@ -229,7 +229,7 @@ function CategoryHero({
   const [failed, setFailed] = useState(false);
   const showImage = Boolean(category.image) && !failed;
   return (
-    <div className="sticky top-14 z-10 relative h-32 overflow-hidden">
+    <div className="sticky top-14 z-10 relative h-20 overflow-hidden">
       {showImage ? (
         <>
           <img
