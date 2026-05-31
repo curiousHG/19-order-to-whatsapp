@@ -2,8 +2,10 @@
   "name": "ecommerce-dev",
   "private": true,
   "scripts": {
-    "dev": "concurrently --kill-others --names \"django,vite\" --prefix-colors \"blue,green\" \"uv run python manage.py runserver\" \"cd frontend && npm run dev\"",
-    "install:frontend": "cd frontend && npm install"
+    "dev": "concurrently --kill-others --names \"django,nextjs\" --prefix-colors \"blue,green\" \"uv run python manage.py runserver\" \"cd web && npm run dev -- \"",
+    "dev:mobile": "concurrently --kill-others --names \"django,nextjs\" --prefix-colors \"blue,green\" \"uv run python manage.py runserver 0.0.0.0:8000\" \"cd web && npm run dev -- --hostname 0.0.0.0\"",
+    "dev:prod": "cd web && NEXT_PUBLIC_API_URL='' npm run build && cd .. && uv run python manage.py collectstatic --noinput --clear && DEBUG=False uv run gunicorn core.wsgi --bind 127.0.0.1:8000",
+    "install:web": "cd web && npm install"
   },
   "devDependencies": {
     "concurrently": "^8.2.0"

@@ -4,12 +4,16 @@ from django.contrib.auth.models import User
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    
-    # category is a foreign key so we need to serialize it
-    # category = serializers.CharField(source='category.name')
+    image = serializers.SerializerMethodField()
+
+    def get_image(self, obj):
+        if obj.image:
+            return obj.image.url
+        return None
+
     class Meta:
         model = Product
-        fields = ('id','category', 'name', 'price','unit', 'description')
+        fields = ('id', 'category', 'name', 'price', 'unit', 'description', 'image', 'available')
 
 
 class OrderSeralizer(serializers.ModelSerializer):

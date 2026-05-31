@@ -11,6 +11,8 @@ dependencies = [
     "psycopg2-binary>=2.9",
     "python-dotenv==1.0.1",
     "Pillow>=10.3",
+    "cloudinary>=1.40",
+    "django-cloudinary-storage>=0.3",
 ]
 
 [dependency-groups]

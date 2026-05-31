@@ -1,17 +1,29 @@
 from django.contrib import admin
+from django.utils.html import format_html
 
 from .models import Category, Product, Customer, Order, OrderItem
+
+
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name',)
+    list_display = ('name', 'slug')
     prepopulated_fields = {'slug': ('name',)}
+
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'category', 'price', 'last_updated']
-    list_filter = ['category']
-    list_editable = ['price', ]
+    list_display = ['name', 'category', 'price', 'unit', 'available', 'image_preview', 'last_updated']
+    list_filter = ['category', 'available', 'unit']
+    list_editable = ['price', 'available']
+    search_fields = ['name', 'description']
     prepopulated_fields = {'slug': ('name',)}
+    readonly_fields = ['image_preview']
+
+    def image_preview(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" style="height:50px;border-radius:4px;" />', obj.image.url)
+        return "—"
+    image_preview.short_description = "Preview"
     
 
 

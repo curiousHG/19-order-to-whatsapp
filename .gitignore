@@ -15,9 +15,7 @@
 # Django
 staticfiles/
 
-# Frontend
-frontend/node_modules/
-frontend/static/frontend/
+# Frontend (web/ has its own .gitignore for .next/, out/, etc.)
 node_modules/
 
 # OS

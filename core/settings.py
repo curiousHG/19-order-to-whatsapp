@@ -37,7 +37,7 @@ ALLOWED_HOSTS = [
     "www.19onlineshop.com",
     "localhost",
     "127.0.0.1",
-    "19-order-to-whatsapp-production.up.railway.app",
+    ".up.railway.app",
     "19onlineShop.com",
     "192.168.0.101",
 ]
@@ -57,8 +57,9 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "store.apps.StoreConfig",
-    "frontend.apps.FrontendConfig",
     "corsheaders",
+    "cloudinary",
+    "cloudinary_storage",
 ]
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
@@ -83,7 +84,7 @@ ROOT_URLCONF = "core.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "frontend/templates"],
+        "DIRS": [],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -96,7 +97,7 @@ TEMPLATES = [
     },
 ]
 
-CSRF_TRUSTED_ORIGINS = ['https://19onlineshop.com', 'https://www.19onlineshop.com', 'http://localhost:3000']
+CSRF_TRUSTED_ORIGINS = ['https://19onlineshop.com', 'https://www.19onlineshop.com', 'http://localhost:3000', 'https://*.up.railway.app']
 
 WSGI_APPLICATION = "core.wsgi.application"
 
@@ -112,7 +113,6 @@ if DEBUG:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
-            # "NAME": BASE_DIR / "temp.sqlite3",
             "NAME": BASE_DIR / "db.sqlite3",
         }
     }
@@ -173,15 +173,39 @@ USE_TZ = True
 # else:
     # Production: Use compressed manifest storage
 STORAGES = {
-    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+    "default": {
+        "BACKEND": (
+            "django.core.files.storage.FileSystemStorage"
+            if DEBUG
+            else "cloudinary_storage.storage.MediaCloudinaryStorage"
+        )
+    },
+    "staticfiles": {
+        "BACKEND": (
+            "django.contrib.staticfiles.storage.StaticFilesStorage"
+            if DEBUG
+            else "whitenoise.storage.CompressedManifestStaticFilesStorage"
+        )
+    },
 }
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATIC_URL = "static/"
 
+# Serve the Next.js static export (web/out/) at the site root via Whitenoise.
+# `npm run build` produces web/out/; collectstatic pulls it into STATIC_ROOT.
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "web", "out")]
+WHITENOISE_ROOT = os.path.join(BASE_DIR, "staticfiles")
+WHITENOISE_INDEX_FILE = True
+
 MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 MEDIA_URL = "/media/"
+
+# Cloudinary — non-DEBUG environments store uploaded media on Cloudinary CDN.
+# DEBUG=True keeps FileSystemStorage so local dev doesn't need Cloudinary creds.
+CLOUDINARY_STORAGE = {
+    "CLOUDINARY_URL": os.getenv("CLOUDINARY_URL"),
+}
 
 
 # Default primary key field type

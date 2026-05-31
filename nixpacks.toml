@@ -1,14 +1,17 @@
+[phases.setup]
+nixPkgs = ["nodejs_22", "python312", "uv"]
+
 [phases.install]
 cmds = [
-  "pip install uv",
-  "uv sync --no-dev"
+  "uv sync --no-dev",
+  "cd web && npm ci",
 ]
 
 [phases.build]
 cmds = [
-  "cd frontend && npm ci && npm run build",
-  "uv run python manage.py collectstatic --noinput"
+  "cd web && npm run build",
+  "uv run python manage.py collectstatic --noinput",
 ]
 
 [start]
-cmd = "gunicorn core.wsgi --log-file -"
+cmd = "uv run gunicorn core.wsgi --log-file -"
