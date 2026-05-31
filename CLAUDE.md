@@ -10,25 +10,27 @@ Two deployments:
 - **Backend** — Django + DRF on Railway, serving the JSON API at `/store/*`.
 - **Frontend** — Next.js 16 statically exported (`output: "export"`) and served by the same Django/Whitenoise process; same origin as the API in prod.
 
-The repo's root `package.json` exists only to run both dev servers together via `concurrently` — the frontend has its own `package.json` inside `web/`.
+The repo root has `dev.py`, a stdlib-only Python runner (invoked via `uv run dev.py …`) that starts both dev servers together. The frontend has its own `package.json` inside `web/`; there is no root `package.json`.
 
 ## Commands
 
 ### First-time setup
 
 ```bash
-uv sync                    # Python deps → .venv
-npm install                # root: installs concurrently
-npm run install:web        # frontend deps → web/node_modules
+uv sync                       # Python deps → .venv
+uv run dev.py install-web     # frontend deps → web/node_modules
 uv run python manage.py migrate
 ```
 
 ### Dev (both servers, one command)
 
 ```bash
-npm run dev          # Django :8000 + Next.js :3000
-npm run dev:mobile   # same, bound to 0.0.0.0 for LAN testing
+uv run dev.py dev      # Django :8000 + Next.js :3000 (split-port HMR)
+uv run dev.py mobile   # same, bound to 0.0.0.0 for LAN testing
+uv run dev.py prod     # single-origin: next build + collectstatic + gunicorn on :8000
 ```
+
+`dev.py` is a stdlib-only Python runner that replaces the old root `package.json` (no root `node_modules` needed).
 
 ### Backend only
 
@@ -122,7 +124,7 @@ There is no Vercel deployment. The `web/vercel.json` file has been removed.
 ### Key files
 
 - `lib/types.ts` — shared TypeScript interfaces matching the Django serializers
-- `lib/api.ts` — `getCategories()`, `postOrder()` — base URL from `NEXT_PUBLIC_API_URL`
+- `lib/api.ts` — `getCategories()`, `postOrder()` — uses relative URLs (`/store/...`); the Next dev server proxies them to Django on :8000 via `rewrites()` in `next.config.ts`, and in prod the static bundle hits the same origin Django is served from
 - `lib/cart-store.ts` — Zustand store + `getUnitsFor()` helper + `buildWhatsAppUrl()` (constructs the `wa.me/...?text=...` link from the cart)
 - `components/store/StoreView.tsx` — main interactive store (client component)
 - `components/store/ProductRow.tsx` — quantity input + unit selector per product
@@ -149,12 +151,7 @@ These come from `getUnitsFor()` in `lib/cart-store.ts`. The unit chosen at cart 
 
 ### Env vars
 
-```
-NEXT_PUBLIC_API_URL=http://localhost:8000   # dev (web/.env.local) — split-port
-NEXT_PUBLIC_API_URL=                        # prod (Railway) — empty → same-origin relative URLs
-```
-
-`lib/api.ts` uses `process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'` so an empty string is honored as "same origin" (it would have been overridden by `||`).
+The frontend doesn't need any. `lib/api.ts` uses relative URLs; the Next dev server's `rewrites()` (in `next.config.ts`) proxies `/store/*`, `/admin/*`, and `/media/*` to `http://localhost:8000` during dev, and prod is single-origin so the same URLs hit Django directly.
 
 ## Tests
 
@@ -188,7 +185,6 @@ There are no frontend tests yet.
 - `nixpacks.toml` — Railway build (`uv sync` + `collectstatic`)
 - `web/next.config.ts`, `web/components.json`, `web/postcss.config.mjs` — Next/shadcn/Tailwind config
 - `.env` (root, gitignored) — `SECRET_KEY`, `DEBUG`, DB creds, `CLOUDINARY_URL`
-- `web/.env.local` (gitignored) — `NEXT_PUBLIC_API_URL`
 
 ## Project layout
 

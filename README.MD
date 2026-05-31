@@ -9,7 +9,7 @@ Live: https://www.19onlineshop.com
 - **Backend**: Django 3 + Django REST Framework, Cloudinary for product images, PostgreSQL in prod / SQLite in dev.
 - **Frontend**: Next.js 16 (App Router, React 19, TypeScript) statically exported, Zustand for cart state, shadcn/ui + Tailwind v4.
 - **Deployment**: single Railway service — Django serves the API at `/store/*` and the exported Next.js build at `/`.
-- **Tooling**: `uv` for Python deps, `npm` for the frontend, `concurrently` to run both dev servers from the repo root.
+- **Tooling**: `uv` for Python deps, `npm` for the frontend, `dev.py` (stdlib-only) to run both dev servers from the repo root.
 
 ## Prerequisites
 
@@ -19,9 +19,8 @@ Live: https://www.19onlineshop.com
 ## First-time setup
 
 ```bash
-uv sync                # Python deps → .venv
-npm install            # installs concurrently at the repo root
-npm run install:web    # frontend deps → web/node_modules
+uv sync                       # Python deps → .venv
+uv run dev.py install-web     # frontend deps → web/node_modules
 ```
 
 Create `.env` at the repo root:
@@ -33,13 +32,7 @@ DEBUG=True
 
 For production builds, also add `DB_NAME`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`, and `CLOUDINARY_URL`.
 
-Create `web/.env.local` so the frontend can reach the API in dev (the dev workflow runs two servers on different ports):
-
-```
-NEXT_PUBLIC_API_URL=http://localhost:8000
-```
-
-In production the UI and API share the same Railway origin, so `NEXT_PUBLIC_API_URL` is set to an empty string on Railway and the static bundle issues relative requests (e.g. `/store/category`).
+No frontend env file is needed: the Next dev server proxies `/store/*`, `/admin/*`, and `/media/*` to Django on `:8000` (see `rewrites()` in `web/next.config.ts`), so the same relative URLs work in both dev and prod.
 
 Apply migrations:
 
@@ -50,10 +43,10 @@ uv run python manage.py migrate
 ## Run the app
 
 ```bash
-npm run dev
+uv run dev.py dev
 ```
 
-Starts both servers via `concurrently`:
+Starts both servers in one terminal:
 
 - Django (API) → http://localhost:8000
 - Next.js (UI) → http://localhost:3000 ← open this
@@ -63,10 +56,18 @@ Stop with Ctrl+C; both processes shut down together.
 ### LAN / mobile testing
 
 ```bash
-npm run dev:mobile
+uv run dev.py mobile
 ```
 
 Binds both servers to `0.0.0.0` so you can hit them from your phone on the same Wi-Fi.
+
+### Single-origin prod-style run
+
+```bash
+uv run dev.py prod
+```
+
+Builds the Next.js static export, runs `collectstatic`, then serves everything via gunicorn on http://localhost:8000 — matches what Railway runs in production.
 
 ### Running servers individually
 
@@ -102,7 +103,6 @@ Required Railway env vars:
 ```
 SECRET_KEY=<random>
 DEBUG=False
-NEXT_PUBLIC_API_URL=          # empty → relative API calls (same origin)
 DB_NAME, DB_PASSWORD, DB_HOST, DB_PORT
 CLOUDINARY_URL=<from cloudinary>
 ```
@@ -118,8 +118,8 @@ web/       Next.js frontend
   app/         App Router pages (page.tsx, checkout/, layout.tsx)
   components/  cart/, checkout/, layout/, store/, ui/
   lib/         api.ts, cart-store.ts, types.ts, utils.ts
+dev.py         Single-file dev runner (replaces root package.json)
 nixpacks.toml  Railway build config
-package.json   Root dev scripts (concurrently)
 pyproject.toml Python deps (managed by uv)
 ```
 
