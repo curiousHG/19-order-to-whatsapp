@@ -20,6 +20,7 @@ export interface Category {
 export interface CartItem {
   productId: number
   name: string
+  image: string | null
   quantity: number
   unit: string
 }
