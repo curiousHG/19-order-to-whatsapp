@@ -94,10 +94,14 @@ class OrderSerializer(serializers.ModelSerializer):
         for product_data in products:
             product = found[product_data['productId']]
             qty = product_data['quantity']
-            # The snapshot keeps the product's name AT ORDER TIME — that's
+            # The snapshot keeps `name + description` AT ORDER TIME — that's
             # what the admin and WhatsApp message use, so a later rename
-            # doesn't rewrite history.
-            snapshot.append({"product": product.name, "quantity": qty})
+            # (or description tweak) doesn't rewrite history. Description
+            # disambiguates products that share a base name e.g.
+            # "Atta (19no)" vs "Atta (10kg pack)".
+            desc = (product.description or '').strip()
+            name = f"{product.name} {desc}".strip() if desc else product.name
+            snapshot.append({"product": name, "quantity": qty})
             OrderItem.objects.create(order=order, product=product, quantity=qty)
         order.products = snapshot
         order.save()

@@ -9,6 +9,15 @@ interface ProductRowProps {
   product: Product;
 }
 
+// What we store in the cart (and ultimately what shows on WhatsApp + the
+// admin's order snapshot). Description gives extra disambiguation like
+// "Atta (19no)" or "Hing 50g pack", which is useful when several products
+// share a base name.
+function displayName(p: Product): string {
+  const desc = (p.description ?? "").trim();
+  return desc ? `${p.name} ${desc}` : p.name;
+}
+
 export function ProductRow({ product }: ProductRowProps) {
   const { items, setItem } = useCartStore();
   const cartItem = items.find((i) => i.productId === product.id);
@@ -30,7 +39,7 @@ export function ProductRow({ product }: ProductRowProps) {
   function sync(quantity: number, u: string) {
     setItem({
       productId: product.id,
-      name: product.name,
+      name: displayName(product),
       image: product.image,
       quantity,
       unit: u,
