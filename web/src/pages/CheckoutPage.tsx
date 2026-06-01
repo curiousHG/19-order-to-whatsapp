@@ -164,13 +164,20 @@ export function CheckoutPage() {
                   </a>
                 </p>
               ) : (
-                <a
-                  href="/accounts/google/login/?process=login&next=/checkout"
-                  className="flex items-center justify-center gap-2 w-full h-10 rounded-md border border-border bg-white text-sm font-medium text-foreground hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation"
-                >
-                  <GoogleG className="h-4 w-4" />
-                  Sign in with Google
-                </a>
+                <>
+                  <a
+                    href="/accounts/google/login/?process=login&next=/checkout"
+                    className="flex items-center justify-center gap-2 w-full h-10 rounded-md border border-border bg-white text-sm font-medium text-foreground hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation"
+                  >
+                    <GoogleG className="h-4 w-4" />
+                    Sign in with Google
+                  </a>
+                  <div className="flex items-center gap-3 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+                    <span className="flex-1 h-px bg-border" />
+                    or fill in below
+                    <span className="flex-1 h-px bg-border" />
+                  </div>
+                </>
               )}
 
               <div className="space-y-1.5">

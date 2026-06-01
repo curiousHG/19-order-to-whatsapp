@@ -113,7 +113,10 @@ class OrderView(generics.ListCreateAPIView):
     serializer_class = OrderSerializer
 
     def post(self, request, format=None):
-        serializer = OrderSerializer(data=request.data)
+        # context={'request': request} so OrderSerializer.create() can read
+        # the session-authenticated auth.User off request._request.user and
+        # link Customer.user to it.
+        serializer = OrderSerializer(data=request.data, context={'request': request})
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         try:

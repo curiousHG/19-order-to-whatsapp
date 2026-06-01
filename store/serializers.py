@@ -104,5 +104,5 @@ class OrderSerializer(serializers.ModelSerializer):
             snapshot.append({"product": name, "quantity": qty})
             OrderItem.objects.create(order=order, product=product, quantity=qty)
         order.products = snapshot
-        order.save()
+        order.save(update_fields=['products'])
         return order
