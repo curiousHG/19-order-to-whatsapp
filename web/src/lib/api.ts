@@ -18,6 +18,8 @@ export interface Me {
   authenticated: boolean;
   name?: string;
   email?: string;
+  phone?: string;
+  address?: string;
 }
 
 // Cookies needed so the session is read. credentials defaults to same-origin

@@ -27,17 +27,26 @@ export function CheckoutPage() {
   // until the first response; { authenticated: false } if not signed in.
   const { data: me } = useSWR("me", getMe);
 
-  // If a logged-in user has empty name/email in the persisted customer
-  // store, pre-fill from the Google profile. Don't overwrite anything
-  // the user already typed.
+  // If a logged-in user has empty fields in the persisted customer store,
+  // pre-fill from /store/me/ (which itself sources name+email from the
+  // Google profile and phone+address from the user's last order). Never
+  // overwrite anything the user already typed.
   useEffect(() => {
     if (!me?.authenticated) return;
-    const patch: Partial<{ name: string; email: string }> = {};
+    const patch: Partial<{ name: string; email: string; phone: string; address: string }> = {};
     if (!customer.name.trim() && me.name) patch.name = me.name;
     if (!customer.email.trim() && me.email) patch.email = me.email;
+    if (!customer.phone.trim() && me.phone) patch.phone = me.phone;
+    if (!customer.address.trim() && me.address) patch.address = me.address;
     if (Object.keys(patch).length > 0) setCustomer(patch);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [me]);
+
+  // Phone is displayed as a 10-digit local number next to a fixed +91 badge.
+  // Storage normalisation: strip everything non-digit and keep the last 10
+  // digits. Handles legacy localStorage values like "+91 9876543210" and any
+  // /me/ pre-fill the server returns from older Customer rows.
+  const phoneDigits = customer.phone.replace(/\D/g, '').slice(-10);
 
   const isEmpty = items.length === 0;
 
@@ -47,11 +56,12 @@ export function CheckoutPage() {
 
     const customerName = customer.name.trim() || "NoName";
     const customerAddress = customer.address.trim() || "NoAddress";
-    const customerPhone = customer.phone.trim();
     const customerEmail = customer.email.trim();
+    // Always send +91-prefixed; phoneDigits is the 10-digit local portion.
+    const customerPhone = phoneDigits ? `+91 ${phoneDigits}` : "";
 
-    if (!customerPhone) {
-      toast.error("Phone is required", {
+    if (phoneDigits.length !== 10) {
+      toast.error("Enter a 10-digit phone number", {
         description: "The shop needs a number to confirm your order.",
       });
       phoneInputRef.current?.focus();
@@ -204,17 +214,32 @@ export function CheckoutPage() {
                     *
                   </span>
                 </label>
-                <Input
-                  ref={phoneInputRef}
-                  id="phone"
-                  type="tel"
-                  value={customer.phone}
-                  onChange={(e) => setCustomer({ phone: e.target.value })}
-                  placeholder="+91 98765 43210"
-                  autoComplete="tel"
-                  required
-                  className="h-10"
-                />
+                <div className="flex">
+                  <span
+                    className="flex items-center px-3 h-10 rounded-l-lg border border-r-0 border-input bg-muted text-sm font-medium text-muted-foreground select-none"
+                    aria-hidden
+                  >
+                    +91
+                  </span>
+                  <Input
+                    ref={phoneInputRef}
+                    id="phone"
+                    type="tel"
+                    inputMode="numeric"
+                    autoComplete="tel-national"
+                    pattern="[0-9]{10}"
+                    maxLength={10}
+                    value={phoneDigits}
+                    onChange={(e) =>
+                      setCustomer({
+                        phone: e.target.value.replace(/\D/g, "").slice(0, 10),
+                      })
+                    }
+                    placeholder="98765 43210"
+                    required
+                    className="h-10 rounded-l-none tracking-wide"
+                  />
+                </div>
               </div>
 
               <div className="space-y-1.5">
@@ -240,15 +265,16 @@ export function CheckoutPage() {
 
               <div className="space-y-1.5">
                 <label className="text-sm font-medium" htmlFor="address">
-                  Address
+                  Delivery address
                 </label>
-                <Input
+                <textarea
                   id="address"
                   value={customer.address}
                   onChange={(e) => setCustomer({ address: e.target.value })}
-                  placeholder="Your delivery address"
+                  placeholder={"House / shop no., street\nArea, landmark\nCity — Pincode"}
                   autoComplete="street-address"
-                  className="h-10"
+                  rows={3}
+                  className="w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-2 text-base leading-relaxed placeholder:text-muted-foreground placeholder:whitespace-pre-line focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 outline-none resize-y md:text-sm"
                 />
               </div>
 

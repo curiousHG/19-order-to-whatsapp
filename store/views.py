@@ -33,13 +33,30 @@ class MeView(APIView):
         if not user.is_authenticated:
             return Response({"authenticated": False})
         full_name = (user.get_full_name() or user.first_name or "").strip()
-        return Response(
-            {
-                "authenticated": True,
-                "name": full_name or user.username,
-                "email": user.email or "",
-            }
+        data = {
+            "authenticated": True,
+            "name": full_name or user.username,
+            "email": user.email or "",
+        }
+        # Pre-fill phone + address from the most recent order this account
+        # has placed, so a returning shopper on a fresh device (no localStorage
+        # yet) gets their last shipping info back without retyping. We prefer
+        # the name they actually used at last checkout over the Google
+        # profile name — same intuition: that's what they'll want again.
+        last = (
+            Customer.objects
+            .filter(user=user)
+            .order_by('-date_created')
+            .first()
         )
+        if last:
+            if last.name:
+                data["name"] = last.name
+            if last.phone:
+                data["phone"] = last.phone
+            if last.address:
+                data["address"] = last.address
+        return Response(data)
 
 logger = logging.getLogger(__name__)
 
