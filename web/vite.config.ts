@@ -25,7 +25,22 @@ export default defineConfig({
       "/store": "http://localhost:8000",
       "/admin": "http://localhost:8000",
       "/media": "http://localhost:8000",
-      "/accounts": "http://localhost:8000",
+      // /accounts needs the Host header preserved as the browser sent it
+      // (localhost:3000) so django-allauth builds the Google OAuth
+      // redirect_uri using the SPA's origin. Vite's http-proxy, contrary to
+      // the docs, defaults to sending Host: localhost:8000 here; the
+      // configure callback below restores the client's Host on each proxied
+      // request. Without this you get an Error 400 redirect_uri_mismatch
+      // because Django asks Google to call back to :8000.
+      "/accounts": {
+        target: "http://localhost:8000",
+        changeOrigin: false,
+        configure: (proxy) => {
+          proxy.on("proxyReq", (proxyReq, req) => {
+            if (req.headers.host) proxyReq.setHeader("host", req.headers.host);
+          });
+        },
+      },
     },
   },
   build: {
