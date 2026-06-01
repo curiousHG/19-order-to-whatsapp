@@ -139,6 +139,11 @@ TEMPLATES = [
 
 CSRF_TRUSTED_ORIGINS = ['https://19onlineshop.com', 'https://www.19onlineshop.com', 'http://localhost:3000', 'https://*.up.railway.app']
 
+# Railway's edge terminates SSL and forwards as HTTP. Without this Django
+# builds absolute URIs with http:// (including the Google OAuth redirect_uri),
+# which Google then rejects as a mismatch.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 WSGI_APPLICATION = "core.wsgi.application"
 
 
