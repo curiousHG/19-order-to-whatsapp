@@ -37,6 +37,30 @@ export const useCartStore = create<CartState>()(
   )
 )
 
+// Persisted "last used" customer details, so a returning shopper doesn't
+// have to retype name / address / phone / email on every order. Pulled from
+// (and pushed back into) `localStorage["customer"]` automatically.
+interface CustomerState {
+  name: string
+  address: string
+  phone: string
+  email: string
+  setCustomer: (c: Partial<Omit<CustomerState, 'setCustomer'>>) => void
+}
+
+export const useCustomerStore = create<CustomerState>()(
+  persist(
+    (set) => ({
+      name: '',
+      address: '',
+      phone: '',
+      email: '',
+      setCustomer: (c) => set((s) => ({ ...s, ...c })),
+    }),
+    { name: 'customer' }
+  )
+)
+
 // Unit options keyed by the canonical base unit
 export const UNIT_OPTIONS: Record<string, string[]> = {
   KG: ['KG', 'gm'],
@@ -72,16 +96,27 @@ export function stepForUnit(unit: string): number {
   return unit === 'gm' || unit === 'mL' ? 50 : 1
 }
 
-export function buildWhatsAppUrl(
-  name: string,
-  address: string,
-  items: CartItem[]
-): string {
-  const message = [
+interface OrderHeader {
+  name: string
+  address: string
+  phone: string
+  email?: string
+}
+
+export function buildWhatsAppUrl(header: OrderHeader, items: CartItem[]): string {
+  const headerLines = [
     '*Order from Khari Baoli*',
     '',
-    `*Name:* ${name}`,
-    `*Address:* ${address}`,
+    `*Name:* ${header.name}`,
+    `*Phone:* ${header.phone}`,
+  ]
+  if (header.email && header.email.trim()) {
+    headerLines.push(`*Email:* ${header.email}`)
+  }
+  headerLines.push(`*Address:* ${header.address}`)
+
+  const message = [
+    ...headerLines,
     '',
     `*Items (${items.length}):*`,
     formatOrderTable(items),

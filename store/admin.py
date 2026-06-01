@@ -29,9 +29,9 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
-    list_display = ['name', 'address', 'date_created']
+    list_display = ['name', 'phone', 'email', 'address', 'date_created']
     list_filter = ['date_created']
-    search_fields = ['name', 'address']
+    search_fields = ['name', 'phone', 'email', 'address']
 
 # disable adding a new order item from the order page and view products of an order
 class OrderItemInline(admin.TabularInline):

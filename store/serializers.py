@@ -55,7 +55,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
-        fields = ('id', 'name', 'address', 'date_created')
+        fields = ('id', 'name', 'address', 'phone', 'email', 'date_created')
 
 class OrderItemSerializer(serializers.Serializer):
     """Incoming cart line. We accept `productId` (the canonical reference —

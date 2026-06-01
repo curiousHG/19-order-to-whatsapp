@@ -29,6 +29,8 @@ export interface OrderRequest {
   customer: {
     name: string
     address: string
+    phone: string
+    email?: string
   }
   products: Array<{
     productId: number

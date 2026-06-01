@@ -1,8 +1,12 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { ArrowLeft, MessageCircle, ShoppingCart } from "lucide-react";
-import { useCartStore, buildWhatsAppUrl } from "@/lib/cart-store";
+import {
+  useCartStore,
+  useCustomerStore,
+  buildWhatsAppUrl,
+} from "@/lib/cart-store";
 import { postOrder } from "@/lib/api";
 import { SunBadge } from "@/components/layout/SunBadge";
 import { ProductThumb } from "@/components/ProductThumb";
@@ -12,8 +16,10 @@ import { Separator } from "@/components/ui/separator";
 
 export function CheckoutPage() {
   const { items, clearCart } = useCartStore();
-  const [name, setName] = useState("");
-  const [address, setAddress] = useState("");
+  // Persisted across visits via localStorage["customer"].
+  const customer = useCustomerStore();
+  const setCustomer = useCustomerStore((s) => s.setCustomer);
+  const phoneInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
 
   const isEmpty = items.length === 0;
@@ -21,14 +27,29 @@ export function CheckoutPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (isEmpty) return;
+
+    const customerName = customer.name.trim() || "NoName";
+    const customerAddress = customer.address.trim() || "NoAddress";
+    const customerPhone = customer.phone.trim();
+    const customerEmail = customer.email.trim();
+
+    if (!customerPhone) {
+      toast.error("Phone is required", {
+        description: "The shop needs a number to confirm your order.",
+      });
+      phoneInputRef.current?.focus();
+      return;
+    }
+
     setLoading(true);
-
-    const customerName = name.trim() || "NoName";
-    const customerAddress = address.trim() || "NoAddress";
-
     try {
       await postOrder({
-        customer: { name: customerName, address: customerAddress },
+        customer: {
+          name: customerName,
+          address: customerAddress,
+          phone: customerPhone,
+          email: customerEmail || undefined,
+        },
         products: items.map((item) => ({
           productId: item.productId,
           quantity: `${item.quantity} ${item.unit}`,
@@ -37,8 +58,12 @@ export function CheckoutPage() {
       const snapshot = [...items];
       clearCart();
       window.location.href = buildWhatsAppUrl(
-        customerName,
-        customerAddress,
+        {
+          name: customerName,
+          address: customerAddress,
+          phone: customerPhone,
+          email: customerEmail,
+        },
         snapshot
       );
     } catch (err) {
@@ -110,10 +135,54 @@ export function CheckoutPage() {
                 </label>
                 <Input
                   id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  value={customer.name}
+                  onChange={(e) => setCustomer({ name: e.target.value })}
                   placeholder="Your name"
                   autoComplete="name"
+                  className="h-10"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label
+                  className="text-sm font-medium flex items-center gap-1"
+                  htmlFor="phone"
+                >
+                  Phone
+                  <span className="text-destructive" aria-hidden>
+                    *
+                  </span>
+                </label>
+                <Input
+                  ref={phoneInputRef}
+                  id="phone"
+                  type="tel"
+                  value={customer.phone}
+                  onChange={(e) => setCustomer({ phone: e.target.value })}
+                  placeholder="+91 98765 43210"
+                  autoComplete="tel"
+                  required
+                  className="h-10"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label
+                  className="text-sm font-medium flex items-center gap-1"
+                  htmlFor="email"
+                >
+                  Email
+                  <span className="text-xs text-muted-foreground font-normal">
+                    (optional)
+                  </span>
+                </label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={customer.email}
+                  onChange={(e) => setCustomer({ email: e.target.value })}
+                  placeholder="you@example.com"
+                  autoComplete="email"
                   className="h-10"
                 />
               </div>
@@ -124,8 +193,8 @@ export function CheckoutPage() {
                 </label>
                 <Input
                   id="address"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
+                  value={customer.address}
+                  onChange={(e) => setCustomer({ address: e.target.value })}
                   placeholder="Your delivery address"
                   autoComplete="street-address"
                   className="h-10"
