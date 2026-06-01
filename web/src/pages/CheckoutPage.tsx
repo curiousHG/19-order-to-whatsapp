@@ -309,7 +309,7 @@ function CheckoutHeader() {
           <SunBadge className="h-9 w-9" />
           <span className="flex flex-col leading-none">
             <span className="font-serif font-bold text-base tracking-wide">
-              Khari Baoli
+              19 Khari Baoli
             </span>
             <span className="text-amber-200 text-[10px] uppercase tracking-[0.25em] mt-0.5">
               Confirm order

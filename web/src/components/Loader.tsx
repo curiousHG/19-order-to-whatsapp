@@ -21,7 +21,7 @@ export function Loader() {
       <div className="text-center">
         <svg
           viewBox="0 0 80 80"
-          className="h-32 w-32 mx-auto drop-shadow-[0_0_24px_rgba(251,191,36,0.5)]"
+          className="h-56 w-56 mx-auto drop-shadow-[0_0_40px_rgba(251,191,36,0.55)]"
           aria-hidden="true"
         >
           <g
@@ -43,18 +43,20 @@ export function Loader() {
           />
           <text
             x={cx}
-            y={48}
+            y={cy}
             textAnchor="middle"
+            dominantBaseline="central"
             fontFamily="system-ui, -apple-system, sans-serif"
-            fontWeight={800}
-            fontSize={26}
+            fontWeight={900}
+            fontSize={34}
+            letterSpacing={-1.5}
             fill="#15803d"
           >
             19
           </text>
         </svg>
         <p className="mt-6 text-sm font-medium text-amber-900/70 tracking-wider uppercase">
-          Khari Baoli
+          19 Khari Baoli
         </p>
       </div>
     </div>

@@ -107,7 +107,7 @@ interface OrderHeader {
 // details echoed back into a forwardable text.
 export function buildWhatsAppUrl(header: OrderHeader, items: CartItem[]): string {
   const headerLines = [
-    '*Order from Khari Baoli*',
+    '*Order from 19no. Khari Baoli*',
     '',
     `*Name:* ${header.name}`,
     `*Address:* ${header.address}`,
