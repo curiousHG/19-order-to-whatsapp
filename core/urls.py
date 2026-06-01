@@ -30,12 +30,17 @@ def spa(request, *_args, **_kwargs):
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("store/", include("store.urls", namespace="store")),
+    path("accounts/", include("allauth.urls")),  # Google OAuth + signup/login
     # SPA fallback — must come last. Excludes prefixes handled above:
-    # `admin($|/)` and `store($|/)` cover both `/admin` and `/admin/...`
-    # so `/admin` (no slash) reaches Django's APPEND_SLASH redirect instead
-    # of being swallowed by the SPA. /static/ and /assets/* belong to
-    # Whitenoise; /media/ belongs to Django's static() helper in dev.
-    re_path(r"^(?!admin($|/)|store($|/)|static/|assets/|media/).*$", spa, name="spa"),
+    # `admin($|/)`, `store($|/)`, `accounts($|/)` cover both bare and
+    # nested forms so Django routes /admin, /accounts/google/login/, etc.
+    # /static/ and /assets/* belong to Whitenoise; /media/ belongs to
+    # Django's static() helper in dev.
+    re_path(
+        r"^(?!admin($|/)|store($|/)|accounts($|/)|static/|assets/|media/).*$",
+        spa,
+        name="spa",
+    ),
 ]
 
 

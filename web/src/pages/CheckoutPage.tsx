@@ -1,5 +1,6 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import useSWR from "swr";
 import { toast } from "sonner";
 import { ArrowLeft, MessageCircle, ShoppingCart } from "lucide-react";
 import {
@@ -7,7 +8,7 @@ import {
   useCustomerStore,
   buildWhatsAppUrl,
 } from "@/lib/cart-store";
-import { postOrder } from "@/lib/api";
+import { getMe, postOrder } from "@/lib/api";
 import { SunBadge } from "@/components/layout/SunBadge";
 import { ProductThumb } from "@/components/ProductThumb";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,22 @@ export function CheckoutPage() {
   const setCustomer = useCustomerStore((s) => s.setCustomer);
   const phoneInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
+
+  // Who's signed in (via Google OAuth, if anyone). Falls back to undefined
+  // until the first response; { authenticated: false } if not signed in.
+  const { data: me } = useSWR("me", getMe);
+
+  // If a logged-in user has empty name/email in the persisted customer
+  // store, pre-fill from the Google profile. Don't overwrite anything
+  // the user already typed.
+  useEffect(() => {
+    if (!me?.authenticated) return;
+    const patch: Partial<{ name: string; email: string }> = {};
+    if (!customer.name.trim() && me.name) patch.name = me.name;
+    if (!customer.email.trim() && me.email) patch.email = me.email;
+    if (Object.keys(patch).length > 0) setCustomer(patch);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [me]);
 
   const isEmpty = items.length === 0;
 
@@ -128,6 +145,33 @@ export function CheckoutPage() {
               <h2 className="text-xs font-semibold tracking-[0.2em] uppercase text-amber-800">
                 Delivery details
               </h2>
+
+              {/* Google sign-in: skip the form entirely if you've used the
+                  shop before. Top-level <a> (not Link) — we want the browser
+                  to leave the SPA, do the OAuth round-trip, then come back. */}
+              {me?.authenticated ? (
+                <p className="text-xs text-muted-foreground -mt-2">
+                  Signed in as{" "}
+                  <span className="font-semibold text-foreground">
+                    {me.name || me.email}
+                  </span>
+                  {" · "}
+                  <a
+                    href="/accounts/logout/?next=/checkout"
+                    className="text-green-700 hover:underline"
+                  >
+                    sign out
+                  </a>
+                </p>
+              ) : (
+                <a
+                  href="/accounts/google/login/?process=login&next=/checkout"
+                  className="flex items-center justify-center gap-2 w-full h-10 rounded-md border border-border bg-white text-sm font-medium text-foreground hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation"
+                >
+                  <GoogleG className="h-4 w-4" />
+                  Sign in with Google
+                </a>
+              )}
 
               <div className="space-y-1.5">
                 <label className="text-sm font-medium" htmlFor="name">
@@ -246,6 +290,30 @@ function CheckoutHeader() {
         </div>
       </div>
     </header>
+  );
+}
+
+// Google's official "G" mark — inline SVG to avoid an extra asset round-trip.
+function GoogleG({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 18 18" className={className} aria-hidden="true">
+      <path
+        fill="#4285F4"
+        d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.2 1.13-.84 2.08-1.78 2.72v2.26h2.88c1.68-1.55 2.66-3.83 2.66-6.62z"
+      />
+      <path
+        fill="#34A853"
+        d="M9 18c2.43 0 4.46-.8 5.94-2.18l-2.88-2.26c-.8.54-1.82.86-3.06.86-2.35 0-4.34-1.58-5.05-3.71H.92v2.34A8.997 8.997 0 0 0 9 18z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M3.95 10.71A5.41 5.41 0 0 1 3.66 9c0-.59.1-1.17.29-1.71V4.95H.92A8.997 8.997 0 0 0 0 9c0 1.45.35 2.82.92 4.05l3.03-2.34z"
+      />
+      <path
+        fill="#EA4335"
+        d="M9 3.58c1.32 0 2.5.46 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.92 4.95l3.03 2.34C4.66 5.16 6.65 3.58 9 3.58z"
+      />
+    </svg>
   );
 }
 

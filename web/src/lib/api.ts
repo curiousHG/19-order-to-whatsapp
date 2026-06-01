@@ -14,6 +14,23 @@ export async function getCategories(): Promise<Category[]> {
   return res.json();
 }
 
+export interface Me {
+  authenticated: boolean;
+  name?: string;
+  email?: string;
+}
+
+// Cookies needed so the session is read. credentials defaults to same-origin
+// in browsers but we ask explicitly to be safe.
+export async function getMe(): Promise<Me> {
+  const res = await fetch("/store/me/", {
+    cache: "no-store",
+    credentials: "same-origin",
+  });
+  if (!res.ok) return { authenticated: false };
+  return res.json();
+}
+
 export async function postOrder(data: OrderRequest): Promise<void> {
   let res: Response;
   try {

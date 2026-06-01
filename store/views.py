@@ -3,6 +3,7 @@ import logging
 from django.db import IntegrityError, transaction
 from django.shortcuts import render
 from rest_framework import generics, status
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError as DRFValidationError
@@ -14,6 +15,31 @@ from .serializers import (
     OrderSerializer,
     CustomerSerializer,
 )
+
+
+class MeView(APIView):
+    """Tells the SPA whether the visitor has signed in via Google.
+
+    Returns the authenticated user's name + email so the checkout form can
+    pre-fill them on returning visits. We override authentication_classes
+    because the project default is empty (so storefront POSTs don't get
+    CSRF-checked); for this read-only endpoint we want session auth.
+    """
+
+    authentication_classes = [SessionAuthentication]
+
+    def get(self, request):
+        user = request.user
+        if not user.is_authenticated:
+            return Response({"authenticated": False})
+        full_name = (user.get_full_name() or user.first_name or "").strip()
+        return Response(
+            {
+                "authenticated": True,
+                "name": full_name or user.username,
+                "email": user.email or "",
+            }
+        )
 
 logger = logging.getLogger(__name__)
 
