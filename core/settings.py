@@ -81,8 +81,9 @@ ACCOUNT_SIGNUP_FIELDS = ["email*"]
 ACCOUNT_EMAIL_VERIFICATION = "none"
 SOCIALACCOUNT_AUTO_SIGNUP = True          # don't show an intermediate signup form
 SOCIALACCOUNT_LOGIN_ON_GET = True         # skip the confirm-login page on a GET
+ACCOUNT_LOGOUT_ON_GET = True              # logout link works on GET (no confirm screen)
 LOGIN_REDIRECT_URL = "/checkout"          # bounce back to checkout after Google OAuth
-ACCOUNT_LOGOUT_REDIRECT_URL = "/"
+ACCOUNT_LOGOUT_REDIRECT_URL = "/checkout"  # ?next= overrides this per-request
 
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
