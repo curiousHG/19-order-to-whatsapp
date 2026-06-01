@@ -85,12 +85,7 @@ export function CheckoutPage() {
       const snapshot = [...items];
       clearCart();
       window.location.href = buildWhatsAppUrl(
-        {
-          name: customerName,
-          address: customerAddress,
-          phone: customerPhone,
-          email: customerEmail,
-        },
+        { name: customerName, address: customerAddress },
         snapshot
       );
     } catch (err) {

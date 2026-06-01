@@ -99,21 +99,19 @@ export function stepForUnit(unit: string): number {
 interface OrderHeader {
   name: string
   address: string
-  phone: string
-  email?: string
 }
 
+// Phone and email are recorded server-side (Customer row) and shown in the
+// admin, but deliberately omitted from the WhatsApp message — the shop owner
+// already has the chat thread for follow-up and doesn't want the contact
+// details echoed back into a forwardable text.
 export function buildWhatsAppUrl(header: OrderHeader, items: CartItem[]): string {
   const headerLines = [
     '*Order from Khari Baoli*',
     '',
     `*Name:* ${header.name}`,
-    `*Phone:* ${header.phone}`,
+    `*Address:* ${header.address}`,
   ]
-  if (header.email && header.email.trim()) {
-    headerLines.push(`*Email:* ${header.email}`)
-  }
-  headerLines.push(`*Address:* ${header.address}`)
 
   const message = [
     ...headerLines,
