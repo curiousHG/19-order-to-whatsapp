@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from .models import Category, Product, Customer, Order, OrderItem
+
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('name',)
@@ -13,7 +14,6 @@ class ProductAdmin(admin.ModelAdmin):
     list_editable = ['price', ]
     prepopulated_fields = {'slug': ('name',)}
     
-
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
