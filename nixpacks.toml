@@ -14,4 +14,4 @@ cmds = [
 ]
 
 [start]
-cmd = "uv run gunicorn core.wsgi --log-file -"
+cmd = "uv run python manage.py migrate --noinput && uv run gunicorn core.wsgi --log-file -"

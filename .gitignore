@@ -9,6 +9,7 @@
 # Environment
 .env
 .env*
+!.env.example
 
 # Database
 *.sqlite3

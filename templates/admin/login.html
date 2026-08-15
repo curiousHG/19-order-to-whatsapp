@@ -1,0 +1,15 @@
+{% extends "admin/login.html" %}
+{% load socialaccount %}
+
+{% block content %}
+{{ block.super }}
+<div class="submit-row" style="text-align:center; padding-top:0;">
+  <span style="display:block; margin:0 0 12px; color:#666; font-size:12px;">or</span>
+  <a href="{% provider_login_url 'google' next='/admin/' %}"
+     style="display:inline-block; width:100%; box-sizing:border-box; padding:10px 12px;
+            border:1px solid #ccc; border-radius:4px; background:#fff; color:#333;
+            text-decoration:none; font-weight:600;">
+    Sign in with Google
+  </a>
+</div>
+{% endblock %}
