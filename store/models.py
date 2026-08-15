@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 class Category(models.Model):
     name = models.CharField(max_length=100, db_index=True)
     slug = models.SlugField(max_length=100, db_index=True, unique=True, blank=True)
-    image = models.ImageField(upload_to="categories/", blank=True, null=True)
+    image = models.ImageField(upload_to="categories/", max_length=255, blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "categories"
@@ -47,7 +47,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=0, default=0)
     quantity = models.IntegerField(default=0, blank=True)
     available = models.BooleanField(default=True)
-    image = models.ImageField(upload_to="images/", blank=True)
+    image = models.ImageField(upload_to="images/", max_length=255, blank=True)
 
     class Meta:
         verbose_name_plural = "Products"
