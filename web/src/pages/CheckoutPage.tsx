@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import useSWR from "swr";
 import { toast } from "sonner";
-import { ArrowLeft, MessageCircle, ShoppingCart } from "lucide-react";
+import { ArrowLeft, MessageCircle, ShoppingCart, X } from "lucide-react";
 import {
   useCartStore,
   useCustomerStore,
@@ -14,9 +14,10 @@ import { ProductThumb } from "@/components/ProductThumb";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { QtyButtons } from "@/components/ui/QtyButtons";
 
-export function CheckoutPage() {
-  const { items, clearCart } = useCartStore();
+export const CheckoutPage = () => {
+  const { items, setItem, removeItem, clearCart } = useCartStore();
   // Persisted across visits via localStorage["customer"].
   const customer = useCustomerStore();
   const setCustomer = useCustomerStore((s) => s.setCustomer);
@@ -153,24 +154,47 @@ export function CheckoutPage() {
             </div>
             <ul className="divide-y divide-border">
               {items.map((item) => (
-                <li
-                  key={item.productId}
-                  className="px-5 py-3 flex items-center gap-3"
-                >
-                  <ProductThumb
-                    src={item.image}
-                    alt={item.name}
-                    className="h-10 w-10"
+                <li key={item.productId} className="px-5 py-3">
+                  <div className="flex items-start gap-3">
+                    <ProductThumb
+                      src={item.image}
+                      alt={item.name}
+                      className="h-10 w-10"
+                    />
+                    <span className="flex-1 min-w-0 flex flex-col gap-0.5">
+                      <span className="text-sm font-medium leading-snug line-clamp-2">
+                        {item.name}
+                      </span>
+                      <span className="text-sm font-bold text-green-700 tabular-nums">
+                        {item.quantity}
+                        <span className="text-[11px] uppercase tracking-wider text-green-700/70 ml-0.5">
+                          {item.unit}
+                        </span>
+                      </span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeItem(item.productId)}
+                      aria-label={`Remove ${item.name}`}
+                      className="shrink-0 h-8 w-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-red-50 active:bg-red-100 transition-colors touch-manipulation"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <QtyButtons
+                    className="mt-2 rounded-lg border border-green-100"
+                    value={item.quantity}
+                    unit={item.unit}
+                    onChange={(n) =>
+                      setItem({
+                        productId: item.productId,
+                        name: item.name,
+                        image: item.image,
+                        quantity: n,
+                        unit: item.unit,
+                      })
+                    }
                   />
-                  <span className="flex-1 text-sm font-medium truncate">
-                    {item.name}
-                  </span>
-                  <span className="text-sm text-muted-foreground shrink-0">
-                    <span className="font-bold text-green-700">
-                      {item.quantity}
-                    </span>{" "}
-                    {item.unit}
-                  </span>
                 </li>
               ))}
             </ul>
@@ -351,7 +375,7 @@ function CheckoutHeader() {
           <SunBadge className="h-9 w-9" />
           <span className="flex flex-col leading-none">
             <span className="font-serif font-bold text-base tracking-wide">
-              19 Khari Baoli
+              Khari Baoli
             </span>
             <span className="text-amber-200 text-[10px] uppercase tracking-[0.25em] mt-0.5">
               Confirm order

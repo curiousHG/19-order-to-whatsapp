@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { MessageCircle, X } from "lucide-react";
+import { MessageCircle, ShoppingBasket, X } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -9,7 +9,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { QtyButtons } from "@/components/ui/QtyButtons";
-import { SunBadge } from "@/components/layout/SunBadge";
 import { ProductThumb } from "@/components/ProductThumb";
 import { useCartStore } from "@/lib/cart-store";
 
@@ -32,7 +31,6 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
         {/* Brand-tinted header band */}
         <SheetHeader className="px-5 pt-5 pb-4 bg-green-600 text-white shadow-sm border-b border-green-700 relative">
           <SheetTitle className="flex items-center gap-3 text-white pr-10">
-            <SunBadge className="h-9 w-9" />
             <span className="flex flex-col leading-none">
               <span className="font-serif font-bold text-lg tracking-wide">
                 Your Cart
@@ -55,7 +53,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
 
         {itemCount === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-4 px-8 text-center">
-            <SunBadge className="h-20 w-20 opacity-60" />
+            <ShoppingBasket className="h-14 w-14 text-green-600/40" strokeWidth={1.5} />
             <p className="text-sm font-medium text-foreground">
               Your cart is empty
             </p>
@@ -74,21 +72,22 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                     key={item.productId}
                     className="bg-white border border-green-100 rounded-xl shadow-sm overflow-hidden"
                   >
-                    {/* Top: image, qty + unit, name, remove */}
-                    <div className="flex items-center gap-3 p-3">
+                    <div className="flex items-start gap-3 p-3">
                       <ProductThumb
                         src={item.image}
                         alt={item.name}
                         className="h-10 w-10"
                       />
-                      <span className="text-sm font-bold text-green-700 shrink-0 tabular-nums">
-                        {item.quantity}
-                        <span className="text-[11px] uppercase tracking-wider text-green-700/70 ml-0.5">
-                          {item.unit}
+                      <span className="flex-1 min-w-0 flex flex-col gap-0.5">
+                        <span className="text-sm font-medium leading-snug line-clamp-2">
+                          {item.name}
                         </span>
-                      </span>
-                      <span className="flex-1 min-w-0 text-sm font-medium truncate">
-                        {item.name}
+                        <span className="text-sm font-bold text-green-700 tabular-nums">
+                          {item.quantity}
+                          <span className="text-[11px] uppercase tracking-wider text-green-700/70 ml-0.5">
+                            {item.unit}
+                          </span>
+                        </span>
                       </span>
                       <button
                         onClick={() => removeItem(item.productId)}
@@ -126,7 +125,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                 }}
               >
                 <MessageCircle className="h-4 w-4" />
-                Place Order
+                Checkout
               </Button>
               <button
                 onClick={clearCart}
