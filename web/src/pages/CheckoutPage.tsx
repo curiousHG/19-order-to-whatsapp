@@ -20,19 +20,40 @@ export function CheckoutPage() {
   // Persisted across visits via localStorage["customer"].
   const customer = useCustomerStore();
   const setCustomer = useCustomerStore((s) => s.setCustomer);
+  const resetCustomer = useCustomerStore((s) => s.resetCustomer);
+  const nameInputRef = useRef<HTMLInputElement>(null);
   const phoneInputRef = useRef<HTMLInputElement>(null);
+  const addressInputRef = useRef<HTMLTextAreaElement>(null);
   const [loading, setLoading] = useState(false);
 
   // Who's signed in (via Google OAuth, if anyone). Falls back to undefined
   // until the first response; { authenticated: false } if not signed in.
   const { data: me } = useSWR("me", getMe);
 
-  // If a logged-in user has empty fields in the persisted customer store,
-  // pre-fill from /store/me/ (which itself sources name+email from the
-  // Google profile and phone+address from the user's last order). Never
-  // overwrite anything the user already typed.
+  // Keep the persisted details tied to whoever is signed in. Signing in as a
+  // different person replaces them outright, and signing out clears them —
+  // otherwise the next person on a shared device inherits the last one's name
+  // and delivery address. Within one identity, never overwrite typed input.
   useEffect(() => {
-    if (!me?.authenticated) return;
+    if (!me) return;
+
+    if (!me.authenticated) {
+      if (customer.owner) resetCustomer(null);
+      return;
+    }
+
+    const identity = me.email || me.name || "signed-in";
+    if (customer.owner !== identity) {
+      setCustomer({
+        name: me.name ?? "",
+        email: me.email ?? "",
+        phone: me.phone ?? "",
+        address: me.address ?? "",
+        owner: identity,
+      });
+      return;
+    }
+
     const patch: Partial<{ name: string; email: string; phone: string; address: string }> = {};
     if (!customer.name.trim() && me.name) patch.name = me.name;
     if (!customer.email.trim() && me.email) patch.email = me.email;
@@ -54,17 +75,33 @@ export function CheckoutPage() {
     e.preventDefault();
     if (isEmpty) return;
 
-    const customerName = customer.name.trim() || "NoName";
-    const customerAddress = customer.address.trim() || "NoAddress";
+    const customerName = customer.name.trim();
+    const customerAddress = customer.address.trim();
     const customerEmail = customer.email.trim();
     // Always send +91-prefixed; phoneDigits is the 10-digit local portion.
     const customerPhone = phoneDigits ? `+91 ${phoneDigits}` : "";
+
+    if (!customerName) {
+      toast.error("Enter your name", {
+        description: "The shop needs a name to label your order.",
+      });
+      nameInputRef.current?.focus();
+      return;
+    }
 
     if (phoneDigits.length !== 10) {
       toast.error("Enter a 10-digit phone number", {
         description: "The shop needs a number to confirm your order.",
       });
       phoneInputRef.current?.focus();
+      return;
+    }
+
+    if (!customerAddress) {
+      toast.error("Enter your delivery address", {
+        description: "The shop needs somewhere to deliver to.",
+      });
+      addressInputRef.current?.focus();
       return;
     }
 
@@ -156,16 +193,12 @@ export function CheckoutPage() {
                   to leave the SPA, do the OAuth round-trip, then come back. */}
               {me?.authenticated ? (
                 <p className="text-xs text-muted-foreground -mt-2">
-                  Signed in as{" "}
-                  <span className="font-semibold text-foreground">
-                    {me.name || me.email}
-                  </span>
-                  {" · "}
+                  Your details are filled in below.{" "}
                   <a
                     href="/accounts/logout/?next=/checkout"
                     className="text-green-700 hover:underline"
                   >
-                    sign out
+                    Not you?
                   </a>
                 </p>
               ) : (
@@ -186,15 +219,23 @@ export function CheckoutPage() {
               )}
 
               <div className="space-y-1.5">
-                <label className="text-sm font-medium" htmlFor="name">
+                <label
+                  className="text-sm font-medium flex items-center gap-1"
+                  htmlFor="name"
+                >
                   Name
+                  <span className="text-destructive" aria-hidden>
+                    *
+                  </span>
                 </label>
                 <Input
+                  ref={nameInputRef}
                   id="name"
                   value={customer.name}
                   onChange={(e) => setCustomer({ name: e.target.value })}
                   placeholder="Your name"
                   autoComplete="name"
+                  required
                   className="h-10"
                 />
               </div>
@@ -259,16 +300,24 @@ export function CheckoutPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-sm font-medium" htmlFor="address">
+                <label
+                  className="text-sm font-medium flex items-center gap-1"
+                  htmlFor="address"
+                >
                   Delivery address
+                  <span className="text-destructive" aria-hidden>
+                    *
+                  </span>
                 </label>
                 <textarea
+                  ref={addressInputRef}
                   id="address"
                   value={customer.address}
                   onChange={(e) => setCustomer({ address: e.target.value })}
                   placeholder={"House / shop no., street\nArea, landmark\nCity — Pincode"}
                   autoComplete="street-address"
                   rows={3}
+                  required
                   className="w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-2 text-base leading-relaxed placeholder:text-muted-foreground placeholder:whitespace-pre-line focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 outline-none resize-y md:text-sm"
                 />
               </div>

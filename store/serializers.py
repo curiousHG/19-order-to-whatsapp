@@ -1,3 +1,5 @@
+import re
+
 import cloudinary
 from rest_framework import serializers
 from .models import Category, Product, Order, Customer, OrderItem
@@ -53,9 +55,24 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'slug', 'image', 'products')
 
 class CustomerSerializer(serializers.ModelSerializer):
+    # The model keeps these nullable so historical rows and admin-created
+    # Customers still load, but a new order must carry all three. The API is
+    # AllowAny, so the checkout form's validation cannot be the only gate.
+    name = serializers.CharField(max_length=100, allow_blank=False, trim_whitespace=True)
+    address = serializers.CharField(max_length=500, allow_blank=False, trim_whitespace=True)
+    phone = serializers.CharField(max_length=20, allow_blank=False, trim_whitespace=True)
+
     class Meta:
         model = Customer
         fields = ('id', 'name', 'address', 'phone', 'email', 'date_created')
+
+    def validate_phone(self, value):
+        digits = re.sub(r'\D', '', value)
+        if len(digits) < 10:
+            raise serializers.ValidationError(
+                "Enter a phone number with at least 10 digits."
+            )
+        return value
 
 class OrderItemSerializer(serializers.Serializer):
     """Incoming cart line. We accept `productId` (the canonical reference —

@@ -45,17 +45,22 @@ interface CustomerState {
   address: string
   phone: string
   email: string
+  // Which signed-in account these details belong to, so a different person
+  // signing in on the same device doesn't inherit them. Null for guests.
+  owner: string | null
   setCustomer: (c: Partial<Omit<CustomerState, 'setCustomer'>>) => void
+  resetCustomer: (owner?: string | null) => void
 }
+
+const EMPTY = { name: '', address: '', phone: '', email: '' }
 
 export const useCustomerStore = create<CustomerState>()(
   persist(
     (set) => ({
-      name: '',
-      address: '',
-      phone: '',
-      email: '',
+      ...EMPTY,
+      owner: null,
       setCustomer: (c) => set((s) => ({ ...s, ...c })),
+      resetCustomer: (owner = null) => set((s) => ({ ...s, ...EMPTY, owner })),
     }),
     { name: 'customer' }
   )
