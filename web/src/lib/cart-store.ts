@@ -45,8 +45,7 @@ interface CustomerState {
   address: string
   phone: string
   email: string
-  // Which signed-in account these details belong to, so a different person
-  // signing in on the same device doesn't inherit them. Null for guests.
+  // Null for guests; stops a different signed-in person inheriting these.
   owner: string | null
   setCustomer: (c: Partial<Omit<CustomerState, 'setCustomer'>>) => void
   resetCustomer: (owner?: string | null) => void

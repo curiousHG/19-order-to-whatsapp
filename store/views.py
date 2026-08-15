@@ -9,8 +9,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError as DRFValidationError
 
-from .models import Category, Customer, Order, Product
-from .serializers import (
+from store.identity import find_customer
+from store.models import Category, Customer, Order, Product
+from store.serializers import (
     ProductSerializer,
     CategorySerializer,
     OrderSerializer,
@@ -19,21 +20,12 @@ from .serializers import (
 
 
 class MeView(APIView):
-    """Tells the SPA whether the visitor has signed in via Google.
-
-    Returns the authenticated user's name + email so the checkout form can
-    pre-fill them on returning visits. We override authentication_classes
-    because the project default is empty (so storefront POSTs don't get
-    CSRF-checked); for this read-only endpoint we want session auth.
-    """
-
+    # Project default is no auth classes; this read-only endpoint wants session auth.
     authentication_classes = [SessionAuthentication]
 
     def get(self, request):
         user = request.user
-        # A shopper is someone who signed in through the storefront's Google
-        # flow. Admin and the storefront share one session cookie, so without
-        # this an /admin/ login shows up as a signed-in shopper.
+        # Admin shares this session cookie, so require a storefront Google sign-in.
         if not user.is_authenticated or not SocialAccount.objects.filter(user=user).exists():
             return Response({"authenticated": False})
         full_name = (user.get_full_name() or user.first_name or "").strip()
@@ -42,17 +34,8 @@ class MeView(APIView):
             "name": full_name or user.username,
             "email": user.email or "",
         }
-        # Pre-fill phone + address from the most recent order this account
-        # has placed, so a returning shopper on a fresh device (no localStorage
-        # yet) gets their last shipping info back without retyping. We prefer
-        # the name they actually used at last checkout over the Google
-        # profile name — same intuition: that's what they'll want again.
-        last = (
-            Customer.objects
-            .filter(user=user)
-            .order_by('-date_created')
-            .first()
-        )
+        # Authenticated only — resolving anonymous phone numbers would leak addresses.
+        last = find_customer(user=user, email=user.email or "")
         if last:
             if last.name:
                 data["name"] = last.name
@@ -134,9 +117,6 @@ class OrderView(generics.ListCreateAPIView):
     serializer_class = OrderSerializer
 
     def post(self, request, format=None):
-        # context={'request': request} so OrderSerializer.create() can read
-        # the session-authenticated auth.User off request._request.user and
-        # link Customer.user to it.
         serializer = OrderSerializer(data=request.data, context={'request': request})
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -144,7 +124,6 @@ class OrderView(generics.ListCreateAPIView):
             with transaction.atomic():
                 serializer.save()
         except DRFValidationError as e:
-            # raised from OrderSerializer.create() when product names don't exist
             return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
         except IntegrityError:
             logger.exception("IntegrityError creating order")

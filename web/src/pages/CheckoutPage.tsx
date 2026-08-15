@@ -26,14 +26,9 @@ export function CheckoutPage() {
   const addressInputRef = useRef<HTMLTextAreaElement>(null);
   const [loading, setLoading] = useState(false);
 
-  // Who's signed in (via Google OAuth, if anyone). Falls back to undefined
-  // until the first response; { authenticated: false } if not signed in.
   const { data: me } = useSWR("me", getMe);
 
-  // Keep the persisted details tied to whoever is signed in. Signing in as a
-  // different person replaces them outright, and signing out clears them —
-  // otherwise the next person on a shared device inherits the last one's name
-  // and delivery address. Within one identity, never overwrite typed input.
+  // A different identity replaces these; within one identity, never overwrite typing.
   useEffect(() => {
     if (!me) return;
 
@@ -188,9 +183,7 @@ export function CheckoutPage() {
                 Delivery details
               </h2>
 
-              {/* Google sign-in: skip the form entirely if you've used the
-                  shop before. Top-level <a> (not Link) — we want the browser
-                  to leave the SPA, do the OAuth round-trip, then come back. */}
+              {/* Plain <a>: the browser must leave the SPA for the OAuth round-trip. */}
               {me?.authenticated ? (
                 <p className="text-xs text-muted-foreground -mt-2">
                   Your details are filled in below.{" "}

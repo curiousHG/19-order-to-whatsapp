@@ -3,11 +3,6 @@ from django.http import HttpResponsePermanentRedirect
 
 
 class RedirectWWWMiddleware:
-    """Redirect www.<CANONICAL_HOST> to <CANONICAL_HOST>.
-
-    Other hosts — localhost, LAN addresses, *.up.railway.app — pass through.
-    """
-
     def __init__(self, get_response):
         self.get_response = get_response
         self.canonical = getattr(settings, "CANONICAL_HOST", "")

@@ -230,7 +230,13 @@ def cmd_db_sync() -> int:
             return rc
 
         print(f"{COLORS['blue']}[db-sync]{COLORS['reset']} recreating {local['name']}…", flush=True)
-        for sql in (f'DROP DATABASE IF EXISTS "{local["name"]}"',
+        # An open psql or runserver connection blocks DROP DATABASE.
+        terminate = (
+            "SELECT pg_terminate_backend(pid) FROM pg_stat_activity "
+            f"WHERE datname = '{local['name']}' AND pid <> pg_backend_pid()"
+        )
+        for sql in (terminate,
+                    f'DROP DATABASE IF EXISTS "{local["name"]}"',
                     f'CREATE DATABASE "{local["name"]}"'):
             rc = subprocess.call(["psql", "-h", local["host"], "-p", local["port"],
                                   "-U", local["user"], "-d", "postgres", "-c", sql])
