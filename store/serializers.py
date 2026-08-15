@@ -1,15 +1,37 @@
+import cloudinary
 from rest_framework import serializers
 from .models import Category, Product, Order, Customer, OrderItem
 from django.contrib.auth.models import User
 
 
+def _resolve_image_url(image_field):
+    """Resolve the public URL of an ImageField.
+
+    Some legacy rows stored `image.name` as a full Cloudinary URL fragment
+    (e.g. "image/upload/v1751625404/foo.jpg"). The Cloudinary storage
+    backend would then wrap that in another `image/upload/v1/` prefix,
+    producing a broken doubled URL. Detect that case and build the URL
+    directly from the cloud name.
+    """
+    if not image_field:
+        return None
+    name = image_field.name
+    if name.startswith('image/upload/'):
+        cloud = cloudinary.config().cloud_name
+        if cloud:
+            return f'https://res.cloudinary.com/{cloud}/{name}'
+    return image_field.url
+
+
 class ProductSerializer(serializers.ModelSerializer):
-    
-    # category is a foreign key so we need to serialize it
-    # category = serializers.CharField(source='category.name')
+    image = serializers.SerializerMethodField()
+
+    def get_image(self, obj):
+        return _resolve_image_url(obj.image)
+
     class Meta:
         model = Product
-        fields = ('id','category', 'name', 'price','unit', 'description')
+        fields = ('id', 'category', 'name', 'price', 'unit', 'description', 'image', 'available')
 
 
 class OrderSeralizer(serializers.ModelSerializer):
@@ -21,60 +43,66 @@ class OrderSeralizer(serializers.ModelSerializer):
 
 class CategorySerializer(serializers.ModelSerializer):
     products = ProductSerializer(many=True, read_only=True)
+    image = serializers.SerializerMethodField()
+
+    def get_image(self, obj):
+        return _resolve_image_url(obj.image)
+
     class Meta:
         model = Category
-        fields = ('id', 'name', 'slug', 'products')
+        fields = ('id', 'name', 'slug', 'image', 'products')
 
 class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
-        fields = ('id', 'name', 'address', 'date_created')
+        fields = ('id', 'name', 'address', 'phone', 'email', 'date_created')
 
-class OrderItemSerializer(serializers.ModelSerializer):
-
-    # "products":{
-    #         "Chai Masala": "4 KG",
-    #         "Chakki Atta": "2 KG"
-    #     }
-    product = serializers.CharField()
+class OrderItemSerializer(serializers.Serializer):
+    """Incoming cart line. We accept `productId` (the canonical reference —
+    cart state stores it) and resolve the name server-side from the DB so
+    product renames don't break in-flight orders."""
+    productId = serializers.IntegerField()
     quantity = serializers.CharField()
-    class Meta:
-        model = OrderItem
-        fields = ('product', 'quantity')
+
 
 class OrderSerializer(serializers.ModelSerializer):
 
     products = serializers.ListField(child=OrderItemSerializer())
     customer = CustomerSerializer()
+
     class Meta:
         model = Order
         fields = ('customer', 'products')
 
     def create(self, validated_data):
-        # print(validated_data)
-        
         customer = validated_data.pop('customer')
-        products = validated_data.pop('products')
-        # print(products)
-        # products is a dict with name as key and quantity as value
-        """
-        "products":{
-            "Chai Masala": "4 KG",
-            "Chakki Atta": "2 KG"
-        }
-        """
+        products = validated_data.pop('products')  # [{productId, quantity}, ...]
 
-        # everytime create a new customer 
+        # Validate all referenced products exist BEFORE creating the customer
+        # or order, so a stale ID doesn't leave orphan Customer rows.
+        ids = [p['productId'] for p in products]
+        found = {p.id: p for p in Product.objects.filter(id__in=ids)}
+        missing = [str(i) for i in ids if i not in found]
+        if missing:
+            raise serializers.ValidationError(
+                {'products': f"Unknown product id(s): {', '.join(missing)}"}
+            )
+
         user = Customer.objects.create(**customer)
         order = Order.objects.create(customer=user)
-        products_list = []
+        snapshot = []
         for product_data in products:
-            product_name = product_data['product']
-            product_quantity = product_data['quantity']
-            item = {"product": product_name, "quantity": product_quantity}
-            products_list.append(item)
-            product_obj = Product.objects.get(name=product_name)
-            OrderItem.objects.create(order=order, product=product_obj, quantity=product_quantity)
-        order.products = products_list
-        order.save()
+            product = found[product_data['productId']]
+            qty = product_data['quantity']
+            # The snapshot keeps `name + description` AT ORDER TIME — that's
+            # what the admin and WhatsApp message use, so a later rename
+            # (or description tweak) doesn't rewrite history. Description
+            # disambiguates products that share a base name e.g.
+            # "Atta (19no)" vs "Atta (10kg pack)".
+            desc = (product.description or '').strip()
+            name = f"{product.name} {desc}".strip() if desc else product.name
+            snapshot.append({"product": name, "quantity": qty})
+            OrderItem.objects.create(order=order, product=product, quantity=qty)
+        order.products = snapshot
+        order.save(update_fields=['products'])
         return order

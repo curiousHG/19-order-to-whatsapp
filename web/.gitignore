@@ -1,0 +1,8 @@
+node_modules
+dist
+.vite
+tsconfig.tsbuildinfo
+*.log
+.DS_Store
+.env*
+!.env.example

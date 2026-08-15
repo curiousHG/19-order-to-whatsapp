@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 class Category(models.Model):
     name = models.CharField(max_length=100, db_index=True)
     slug = models.SlugField(max_length=100, db_index=True, unique=True, blank=True)
+    image = models.ImageField(upload_to="categories/", max_length=255, blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "categories"
@@ -46,7 +47,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=0, default=0)
     quantity = models.IntegerField(default=0, blank=True)
     available = models.BooleanField(default=True)
-    image = models.ImageField(upload_to="images/", blank=True)
+    image = models.ImageField(upload_to="images/", max_length=255, blank=True)
 
     class Meta:
         verbose_name_plural = "Products"
@@ -58,13 +59,17 @@ class Product(models.Model):
 # create a model for Customer
 
 class Customer(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    name = models.CharField(max_length=100, null=True)
-    address = models.CharField(max_length=500, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    name = models.CharField(max_length=100, null=True, blank=True)
+    address = models.CharField(max_length=500, null=True, blank=True)
+    # Phone is "required" in the frontend form, but the DB column stays
+    # nullable so existing rows (and admin-created Customers) keep working.
+    phone = models.CharField(max_length=20, null=True, blank=True, db_index=True)
+    email = models.EmailField(null=True, blank=True, db_index=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self) -> str:
-        return self.name
+        return self.name or ""
     
 class Order(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True)

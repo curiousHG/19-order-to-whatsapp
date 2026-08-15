@@ -1,16 +1,68 @@
+import logging
+
+from allauth.socialaccount.models import SocialAccount
+from django.db import IntegrityError, transaction
 from django.shortcuts import render
-from django.http import JsonResponse
-from .models import Category, Product, Order, Customer
+from rest_framework import generics, status
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.exceptions import ValidationError as DRFValidationError
+
+from .models import Category, Customer, Order, Product
 from .serializers import (
     ProductSerializer,
     CategorySerializer,
     OrderSerializer,
     CustomerSerializer,
 )
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import generics, viewsets, status
-from rest_framework.decorators import api_view
+
+
+class MeView(APIView):
+    """Tells the SPA whether the visitor has signed in via Google.
+
+    Returns the authenticated user's name + email so the checkout form can
+    pre-fill them on returning visits. We override authentication_classes
+    because the project default is empty (so storefront POSTs don't get
+    CSRF-checked); for this read-only endpoint we want session auth.
+    """
+
+    authentication_classes = [SessionAuthentication]
+
+    def get(self, request):
+        user = request.user
+        # A shopper is someone who signed in through the storefront's Google
+        # flow. Admin and the storefront share one session cookie, so without
+        # this an /admin/ login shows up as a signed-in shopper.
+        if not user.is_authenticated or not SocialAccount.objects.filter(user=user).exists():
+            return Response({"authenticated": False})
+        full_name = (user.get_full_name() or user.first_name or "").strip()
+        data = {
+            "authenticated": True,
+            "name": full_name or user.username,
+            "email": user.email or "",
+        }
+        # Pre-fill phone + address from the most recent order this account
+        # has placed, so a returning shopper on a fresh device (no localStorage
+        # yet) gets their last shipping info back without retyping. We prefer
+        # the name they actually used at last checkout over the Google
+        # profile name — same intuition: that's what they'll want again.
+        last = (
+            Customer.objects
+            .filter(user=user)
+            .order_by('-date_created')
+            .first()
+        )
+        if last:
+            if last.name:
+                data["name"] = last.name
+            if last.phone:
+                data["phone"] = last.phone
+            if last.address:
+                data["address"] = last.address
+        return Response(data)
+
+logger = logging.getLogger(__name__)
 
 
 def all_products(request):
@@ -38,7 +90,6 @@ class ProductsView(APIView):
             }
             for detail in Product.objects.all()
         ]
-        # print( Product.objects.all()[1].__dict__)
         return Response(details)
 
 
@@ -46,16 +97,13 @@ class CategoryListView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
-    # if category/atta then return products with category atta
     def get(self, request, category=None, format=None):
         if category:
-            # category = category.upper()
             products = Product.objects.filter(category__name=category)
             serializer = ProductSerializer(products, many=True)
             return Response(serializer.data)
         return self.list(request)
-    
-    # this is post request to update the prices of all products in a category
+
     def post(self, request, format=None):
         pass
 
@@ -64,29 +112,57 @@ class CustomerView(generics.ListCreateAPIView):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
 
-    # create a post method to create a new customer
     def post(self, request, format=None):
         serializer = CustomerSerializer(data=request.data)
-        if serializer.is_valid():
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
             serializer.save()
+        except IntegrityError:
+            logger.exception("IntegrityError creating customer")
             return Response(
-                {"message": "customer created"}, status=status.HTTP_201_CREATED
+                {"detail": "Could not save customer due to a database error."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"message": "customer created"}, status=status.HTTP_201_CREATED
+        )
 
 
 class OrderView(generics.ListCreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
-    # create a post method to create a new order
-    # print the request data
     def post(self, request, format=None):
-
-        serializer = OrderSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
+        # context={'request': request} so OrderSerializer.create() can read
+        # the session-authenticated auth.User off request._request.user and
+        # link Customer.user to it.
+        serializer = OrderSerializer(data=request.data, context={'request': request})
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            with transaction.atomic():
+                serializer.save()
+        except DRFValidationError as e:
+            # raised from OrderSerializer.create() when product names don't exist
+            return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
+        except IntegrityError:
+            logger.exception("IntegrityError creating order")
             return Response(
-                {"message": "order created"}, status=status.HTTP_201_CREATED
+                {
+                    "detail": (
+                        "Could not save your order due to a database error. "
+                        "Please try again in a moment."
+                    )
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            logger.exception("Unexpected error creating order")
+            return Response(
+                {"detail": "Unexpected error processing the order. Please try again."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+        return Response(
+            {"message": "order created"}, status=status.HTTP_201_CREATED
+        )
