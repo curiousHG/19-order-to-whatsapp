@@ -12,13 +12,11 @@ interface StoreViewProps {
   categories: Category[];
 }
 
-const PAGE_SIZE = 6;
 const SEARCH_LIMIT = 7;
 
 export function StoreView({ categories }: StoreViewProps) {
   const [activeId, setActiveId] = useState<number | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
-  const [page, setPage] = useState(1);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const items = useCartStore((s) => s.items);
@@ -26,8 +24,10 @@ export function StoreView({ categories }: StoreViewProps) {
   const active =
     categories.find((c) => c.id === activeId) ?? categories[0] ?? null;
 
+  // Switching category used to reset the page number, which also put you back
+  // at the top. With one continuous list, scroll back up explicitly.
   useEffect(() => {
-    setPage(1);
+    window.scrollTo({ top: 0 });
   }, [active?.id]);
 
   useEffect(() => {
@@ -43,10 +43,6 @@ export function StoreView({ categories }: StoreViewProps) {
     () => active?.products.filter((p) => p.available) ?? [],
     [active]
   );
-
-  const totalPages = Math.max(1, Math.ceil(visibleProducts.length / PAGE_SIZE));
-  const start = (page - 1) * PAGE_SIZE;
-  const pageItems = visibleProducts.slice(start, start + PAGE_SIZE);
 
   const allProducts = useMemo(
     () => categories.flatMap((c) => c.products.filter((p) => p.available)),
@@ -86,16 +82,16 @@ export function StoreView({ categories }: StoreViewProps) {
         cartCount={items.length}
       />
 
-      <div className="md:hidden flex gap-2 overflow-x-auto px-4 py-2.5 bg-gray-100 border-b border-border shadow-[inset_0_6px_8px_-6px_rgba(22,163,74,0.35)] no-scrollbar shrink-0">
+      <div className="md:hidden sticky top-14 z-30 h-13 flex items-center gap-2 overflow-x-auto px-4 bg-green-700 border-b border-green-800 no-scrollbar shrink-0">
         {categories.map((cat) => (
           <button
             key={cat.id}
             onClick={() => setActiveId(cat.id)}
             className={cn(
-              "shrink-0 px-3 py-1.5 rounded-full text-sm font-medium transition-colors",
+              "shrink-0 px-3 py-1.5 rounded-full text-sm font-bold transition-colors",
               active?.id === cat.id
-                ? "bg-amber-500 text-white"
-                : "bg-gray-100 text-foreground hover:bg-gray-200"
+                ? "bg-amber-400 text-green-950"
+                : "bg-white/15 text-white hover:bg-white/25"
             )}
           >
             {cat.name}
@@ -110,7 +106,7 @@ export function StoreView({ categories }: StoreViewProps) {
               key={cat.id}
               onClick={() => setActiveId(cat.id)}
               className={cn(
-                "text-left px-4 py-3 text-sm font-medium border-b border-border transition-colors",
+                "text-left px-4 py-3 text-sm font-bold border-b border-border transition-colors",
                 active?.id === cat.id
                   ? "bg-amber-500 text-white"
                   : "text-foreground hover:bg-green-50"
@@ -135,32 +131,9 @@ export function StoreView({ categories }: StoreViewProps) {
                   No items available in this category
                 </p>
               ) : (
-                <>
-                  {pageItems.map((product) => (
-                    <ProductRow key={product.id} product={product} />
-                  ))}
-                  {totalPages > 1 && (
-                    <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-white">
-                      <button
-                        disabled={page === 1}
-                        onClick={() => setPage((p) => p - 1)}
-                        className="text-sm font-medium px-3 py-1.5 rounded-md border border-border disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50"
-                      >
-                        ← Prev
-                      </button>
-                      <span className="text-sm text-muted-foreground">
-                        Page {page} of {totalPages}
-                      </span>
-                      <button
-                        disabled={page >= totalPages}
-                        onClick={() => setPage((p) => p + 1)}
-                        className="text-sm font-medium px-3 py-1.5 rounded-md border border-border disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50"
-                      >
-                        Next →
-                      </button>
-                    </div>
-                  )}
-                </>
+                visibleProducts.map((product) => (
+                  <ProductRow key={product.id} product={product} />
+                ))
               )}
             </>
           )}
@@ -229,7 +202,7 @@ function CategoryHero({
   const [failed, setFailed] = useState(false);
   const showImage = Boolean(category.image) && !failed;
   return (
-    <div className="sticky top-14 z-10 relative h-20 overflow-hidden">
+    <div className="sticky top-[6.75rem] md:top-14 z-10 relative h-20 overflow-hidden">
       {showImage ? (
         <>
           <img

@@ -68,16 +68,16 @@ export function ProductRow({ product }: ProductRowProps) {
   return (
     <div
       className={cn(
-        "flex items-center gap-3 px-4 py-3 border-b border-border transition-colors",
+        "row-defer flex items-center gap-3 px-4 py-3 border-b border-border transition-colors",
         inCart ? "bg-green-50" : "bg-white hover:bg-gray-50/60"
       )}
     >
       <ProductThumb src={product.image} alt={product.name} />
 
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-sm leading-tight">{product.name}</p>
+        <p className="font-medium text-base leading-tight">{product.name}</p>
         {product.description && (
-          <p className="text-xs text-muted-foreground truncate">
+          <p className="text-sm text-muted-foreground truncate">
             {product.description}
           </p>
         )}
@@ -102,7 +102,7 @@ export function ProductRow({ product }: ProductRowProps) {
               : undefined
           }
           className={cn(
-            "h-8 px-2 ml-1 rounded-md text-xs font-bold flex items-center justify-center min-w-12 touch-manipulation transition-all",
+            "h-8 px-2 ml-1 rounded-md text-sm font-bold flex items-center justify-center min-w-12 touch-manipulation transition-all",
             canCycleUnit
               ? "bg-green-600 text-white border-2 border-green-700 hover:bg-green-700 active:scale-95 shadow-sm cursor-pointer"
               : "bg-gray-100 text-muted-foreground border border-border cursor-not-allowed"
