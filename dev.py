@@ -11,14 +11,17 @@ Usage:
     uv run dev.py prod         # vite build + collectstatic + gunicorn on :8000
     uv run dev.py install-web  # install web/ npm deps
     uv run dev.py deploy       # railway up --detach (uses ~/.railway-token)
+    uv run dev.py db-sync      # overwrite the local DB with a copy of production
 """
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import signal
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 from dataclasses import dataclass, field
@@ -115,7 +118,7 @@ def cmd_prod() -> int:
     return run_sequential([
         Proc("build",   "green", ["npm", "run", "build"], cwd="web"),
         Proc("collect", "blue",  ["uv", "run", "python", "manage.py", "collectstatic", "--noinput", "--clear"]),
-        Proc("serve",   "blue",  ["uv", "run", "gunicorn", "core.wsgi", "--bind", "127.0.0.1:8000"], env={"DEBUG": "False"}),
+        Proc("serve",   "blue",  ["uv", "run", "gunicorn", "core.wsgi", "--bind", "127.0.0.1:8000"], env={"ENVIRONMENT": "production"}),
     ])
 
 
@@ -145,6 +148,109 @@ def cmd_deploy() -> int:
     return subprocess.call(["railway", "up", "--detach"], env=env)
 
 
+PG16_BIN = "/opt/homebrew/opt/postgresql@16/bin"
+PROD_SERVICE = "19-order-to-whatsapp"
+
+
+def _local_db() -> dict[str, str]:
+    """Read the development database settings from .env."""
+    cfg: dict[str, str] = {}
+    if os.path.isfile(".env"):
+        for line in open(".env"):
+            if "=" in line and not line.strip().startswith("#"):
+                k, v = line.split("=", 1)
+                cfg[k.strip()] = v.strip()
+    return {
+        "name": cfg.get("DB_NAME", "19shopdb"),
+        "user": cfg.get("DB_USER", os.environ.get("USER", "postgres")),
+        "host": cfg.get("DB_HOST", "localhost"),
+        "port": cfg.get("DB_PORT", "5432"),
+    }
+
+
+def _prod_db() -> dict[str, str] | None:
+    """Fetch production credentials from Railway at call time, never stored."""
+    out = subprocess.run(
+        ["railway", "variables", "-s", PROD_SERVICE, "--json"],
+        capture_output=True, text=True,
+    )
+    if out.returncode != 0:
+        print(f"{COLORS['red']}railway variables failed. Run `railway link` first.{COLORS['reset']}",
+              file=sys.stderr)
+        return None
+    raw = out.stdout[out.stdout.find("{"):]
+    try:
+        v = json.loads(raw)
+    except json.JSONDecodeError:
+        print(f"{COLORS['red']}Could not parse railway output.{COLORS['reset']}", file=sys.stderr)
+        return None
+    missing = [k for k in ("DB_HOST", "DB_PORT", "DB_NAME", "DB_PASSWORD") if k not in v]
+    if missing:
+        print(f"{COLORS['red']}Railway is missing {', '.join(missing)}.{COLORS['reset']}",
+              file=sys.stderr)
+        return None
+    return {"host": v["DB_HOST"], "port": v["DB_PORT"],
+            "name": v["DB_NAME"], "password": v["DB_PASSWORD"]}
+
+
+def cmd_db_sync() -> int:
+    """Replace the local database with a fresh copy of production.
+
+    Uses the postgresql@16 client tools: pg_dump refuses to read a server
+    newer than itself, and prod is 16 while the local server is 15.
+    """
+    pg_dump = os.path.join(PG16_BIN, "pg_dump")
+    pg_restore = os.path.join(PG16_BIN, "pg_restore")
+    if not os.path.isfile(pg_dump):
+        print(f"{COLORS['red']}Missing {pg_dump}{COLORS['reset']}\n"
+              "  brew install postgresql@16", file=sys.stderr)
+        return 1
+
+    prod = _prod_db()
+    if prod is None:
+        return 1
+    local = _local_db()
+
+    print(f"{COLORS['blue']}[db-sync]{COLORS['reset']} {prod['host']}  →  "
+          f"{local['host']}:{local['port']}/{local['name']}", flush=True)
+
+    with tempfile.TemporaryDirectory() as tmp:
+        dump = os.path.join(tmp, "prod.dump")
+        env = os.environ.copy()
+        env["PGPASSWORD"] = prod["password"]
+        print(f"{COLORS['blue']}[db-sync]{COLORS['reset']} dumping production…", flush=True)
+        rc = subprocess.call(
+            [pg_dump, "-h", prod["host"], "-p", str(prod["port"]), "-U", "postgres",
+             "-d", prod["name"], "--format=custom", "--no-owner", "--no-privileges",
+             "-f", dump],
+            env=env,
+        )
+        if rc != 0:
+            print(f"{COLORS['red']}[db-sync] dump failed{COLORS['reset']}", file=sys.stderr)
+            return rc
+
+        print(f"{COLORS['blue']}[db-sync]{COLORS['reset']} recreating {local['name']}…", flush=True)
+        for sql in (f'DROP DATABASE IF EXISTS "{local["name"]}"',
+                    f'CREATE DATABASE "{local["name"]}"'):
+            rc = subprocess.call(["psql", "-h", local["host"], "-p", local["port"],
+                                  "-U", local["user"], "-d", "postgres", "-c", sql])
+            if rc != 0:
+                print(f"{COLORS['red']}[db-sync] {sql} failed{COLORS['reset']}", file=sys.stderr)
+                return rc
+
+        print(f"{COLORS['blue']}[db-sync]{COLORS['reset']} restoring…", flush=True)
+        rc = subprocess.call(
+            [pg_restore, "-h", local["host"], "-p", local["port"], "-U", local["user"],
+             "-d", local["name"], "--no-owner", "--no-privileges", dump]
+        )
+        if rc != 0:
+            print(f"{COLORS['red']}[db-sync] restore failed{COLORS['reset']}", file=sys.stderr)
+            return rc
+
+    print(f"{COLORS['green']}[db-sync] done{COLORS['reset']}", flush=True)
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Dev runner for the ecommerce repo")
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -153,6 +259,7 @@ def main() -> int:
     sub.add_parser("prod", help="vite build + collectstatic + gunicorn on :8000")
     sub.add_parser("install-web", help="run npm install in web/")
     sub.add_parser("deploy", help="railway up --detach to the linked service")
+    sub.add_parser("db-sync", help="replace the local database with a copy of production")
     args = parser.parse_args()
 
     return {
@@ -161,6 +268,7 @@ def main() -> int:
         "prod": cmd_prod,
         "install-web": cmd_install_web,
         "deploy": cmd_deploy,
+        "db-sync": cmd_db_sync,
     }[args.cmd]()
 
 
