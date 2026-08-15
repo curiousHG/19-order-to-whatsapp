@@ -1,5 +1,6 @@
 import logging
 
+from allauth.socialaccount.models import SocialAccount
 from django.db import IntegrityError, transaction
 from django.shortcuts import render
 from rest_framework import generics, status
@@ -30,7 +31,10 @@ class MeView(APIView):
 
     def get(self, request):
         user = request.user
-        if not user.is_authenticated:
+        # A shopper is someone who signed in through the storefront's Google
+        # flow. Admin and the storefront share one session cookie, so without
+        # this an /admin/ login shows up as a signed-in shopper.
+        if not user.is_authenticated or not SocialAccount.objects.filter(user=user).exists():
             return Response({"authenticated": False})
         full_name = (user.get_full_name() or user.first_name or "").strip()
         data = {
