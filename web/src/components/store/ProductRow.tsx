@@ -9,12 +9,8 @@ interface ProductRowProps {
   product: Product;
 }
 
-// What we store in the cart (and ultimately what shows on WhatsApp + the
-// admin's order snapshot). Description gives extra disambiguation like
-// "Atta (19no)" or "Hing 50g pack", which is useful when several products
-// share a base name.
 function displayName(p: Product): string {
-  return [p.brand, p.name, (p.description ?? "").trim()]
+  return [p.name, p.brand, (p.description ?? "").trim()]
     .filter(Boolean)
     .join(" ");
 }
@@ -61,9 +57,7 @@ export function ProductRow({ product }: ProductRowProps) {
     const idx = units.indexOf(unit);
     const next = units[(idx + 1) % units.length];
     setUnit(next);
-    // Reset qty on unit change — "2 KG" doesn't equal "2 gm", so re-entering
-    // the quantity in the new unit avoids surprises.
-    sync(0, next);
+    sync(qty, next);
   }
 
   return (

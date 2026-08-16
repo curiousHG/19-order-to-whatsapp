@@ -363,7 +363,7 @@ export const CheckoutPage = () => {
 function CheckoutHeader() {
   return (
     <header className="sticky top-0 z-40 bg-green-600 text-white shadow-md">
-      <div className="relative max-w-2xl mx-auto h-14 flex items-center justify-center px-3">
+      <div className="relative max-w-2xl mx-auto h-16 flex items-center justify-center px-3">
         <Link
           to="/"
           aria-label="Back to shop"

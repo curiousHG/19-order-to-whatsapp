@@ -110,7 +110,7 @@ class OrderSerializer(serializers.ModelSerializer):
             product = found[product_data['productId']]
             qty = product_data['quantity']
             # Snapshot the name at order time so later renames don't rewrite history.
-            parts = [product.brand, product.name, (product.description or '').strip()]
+            parts = [product.name, product.brand, (product.description or '').strip()]
             name = ' '.join(x for x in parts if x)
             snapshot.append({"product": name, "quantity": qty})
             OrderItem.objects.create(order=order, product=product, quantity=qty)

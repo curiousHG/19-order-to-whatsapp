@@ -82,7 +82,7 @@ export function StoreView({ categories }: StoreViewProps) {
         cartCount={items.length}
       />
 
-      <div className="md:hidden sticky top-14 z-30 h-13 flex items-center gap-2 overflow-x-auto px-4 bg-green-700 border-b border-green-800 no-scrollbar shrink-0">
+      <div className="md:hidden sticky top-16 z-30 h-13 flex items-center gap-2 overflow-x-auto px-4 bg-green-700 border-b border-green-800 no-scrollbar shrink-0">
         {categories.map((cat) => (
           <button
             key={cat.id}
@@ -100,7 +100,7 @@ export function StoreView({ categories }: StoreViewProps) {
       </div>
 
       <div className="flex flex-1">
-        <aside className="hidden md:flex flex-col w-52 shrink-0 sticky top-14 self-start h-[calc(100vh-3.5rem)] overflow-y-auto border-r border-border bg-white">
+        <aside className="hidden md:flex flex-col w-52 shrink-0 sticky top-16 self-start h-[calc(100vh-4rem)] overflow-y-auto border-r border-border bg-white">
           {categories.map((cat) => (
             <button
               key={cat.id}
@@ -202,7 +202,7 @@ function CategoryHero({
   const [failed, setFailed] = useState(false);
   const showImage = Boolean(category.image) && !failed;
   return (
-    <div className="sticky top-[6.75rem] md:top-14 z-10 relative h-20 overflow-hidden">
+    <div className="sticky top-[7.25rem] md:top-16 z-10 relative h-20 overflow-hidden">
       {showImage ? (
         <>
           <img
