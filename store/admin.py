@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.db import models
+from django.forms import TextInput
 from django.utils.html import format_html
 
 from store.models import Category, Product, Customer, Order, OrderItem
@@ -6,19 +8,24 @@ from store.models import Category, Product, Customer, Order, OrderItem
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug')
+    list_display = ('name', 'slug', 'shows_speciality')
     prepopulated_fields = {'slug': ('name',)}
 
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'brand', 'description', 'category', 'price', 'unit', 'available',
-                    'image_preview', 'last_updated']
-    list_filter = ['category', 'brand', 'available', 'unit']
-    list_editable = ['price', 'available']
+    list_display = ['name', 'brand', 'description', 'unit', 'available', 'is_speciality', 'category',
+                    'price', 'image_preview', 'last_updated']
+    list_filter = ['category', 'brand', 'is_speciality', 'available', 'unit']
+    list_editable = ['brand', 'description', 'unit', 'available', 'is_speciality']
     search_fields = ['name', 'brand', 'description']
     prepopulated_fields = {'slug': ('name',)}
     readonly_fields = ['image_preview']
+    list_per_page = 50
+    formfield_overrides = {
+        models.TextField: {'widget': TextInput(attrs={'size': 28})},
+        models.CharField: {'widget': TextInput(attrs={'size': 16})},
+    }
 
     def image_preview(self, obj):
         if obj.image:
