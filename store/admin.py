@@ -12,11 +12,11 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'description', 'category', 'price', 'unit', 'available',
+    list_display = ['name', 'brand', 'description', 'category', 'price', 'unit', 'available',
                     'image_preview', 'last_updated']
-    list_filter = ['category', 'available', 'unit']
+    list_filter = ['category', 'brand', 'available', 'unit']
     list_editable = ['price', 'available']
-    search_fields = ['name', 'description']
+    search_fields = ['name', 'brand', 'description']
     prepopulated_fields = {'slug': ('name',)}
     readonly_fields = ['image_preview']
 

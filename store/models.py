@@ -23,6 +23,7 @@ class Product(models.Model):
         Category, related_name="products", on_delete=models.CASCADE
     )
     name = models.CharField(max_length=100, db_index=True)
+    brand = models.CharField(max_length=50, blank=True, db_index=True)
     slug = models.SlugField(max_length=100, db_index=True, blank=True)
     # time is utc + 5:30
     last_updated = models.DateTimeField(auto_now=True)

@@ -14,8 +14,9 @@ interface ProductRowProps {
 // "Atta (19no)" or "Hing 50g pack", which is useful when several products
 // share a base name.
 function displayName(p: Product): string {
-  const desc = (p.description ?? "").trim();
-  return desc ? `${p.name} ${desc}` : p.name;
+  return [p.brand, p.name, (p.description ?? "").trim()]
+    .filter(Boolean)
+    .join(" ");
 }
 
 export function ProductRow({ product }: ProductRowProps) {
@@ -76,8 +77,19 @@ export function ProductRow({ product }: ProductRowProps) {
 
       <div className="flex-1 min-w-0">
         <p className="font-medium text-base leading-tight">{product.name}</p>
-        {product.description && (
+        {(product.brand || product.description) && (
           <p className="text-sm text-muted-foreground truncate">
+            {product.brand && (
+              <span
+                className={cn(
+                  "font-semibold",
+                  product.brand === "19no" && "text-amber-700"
+                )}
+              >
+                {product.brand}
+              </span>
+            )}
+            {product.brand && product.description && " · "}
             {product.description}
           </p>
         )}

@@ -27,7 +27,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('id', 'category', 'name', 'price', 'unit', 'description', 'image', 'available')
+        fields = ('id', 'category', 'name', 'brand', 'price', 'unit', 'description', 'image', 'available')
 
 
 class OrderSeralizer(serializers.ModelSerializer):
@@ -105,8 +105,8 @@ class OrderSerializer(serializers.ModelSerializer):
             product = found[product_data['productId']]
             qty = product_data['quantity']
             # Snapshot the name at order time so later renames don't rewrite history.
-            desc = (product.description or '').strip()
-            name = f"{product.name} {desc}".strip() if desc else product.name
+            parts = [product.brand, product.name, (product.description or '').strip()]
+            name = ' '.join(x for x in parts if x)
             snapshot.append({"product": name, "quantity": qty})
             OrderItem.objects.create(order=order, product=product, quantity=qty)
         order.products = snapshot
