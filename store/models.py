@@ -8,6 +8,8 @@ class Category(models.Model):
     name = models.CharField(max_length=100, db_index=True)
     slug = models.SlugField(max_length=100, db_index=True, unique=True, blank=True)
     image = models.ImageField(upload_to="categories/", max_length=255, blank=True, null=True)
+    # When set, this category serves every product of that brand instead of assigned ones.
+    brand_filter = models.CharField(max_length=50, blank=True)
 
     class Meta:
         verbose_name_plural = "categories"

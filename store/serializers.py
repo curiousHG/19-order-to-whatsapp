@@ -38,8 +38,15 @@ class OrderSeralizer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    products = ProductSerializer(many=True, read_only=True)
+    products = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
+
+    def get_products(self, obj):
+        # A brand_filter category is a collection, not a folder: it serves every
+        # product of that brand, wherever that product actually lives.
+        qs = (Product.objects.filter(brand=obj.brand_filter)
+              if obj.brand_filter else obj.products.all())
+        return ProductSerializer(qs, many=True).data
 
     def get_image(self, obj):
         return _resolve_image_url(obj.image)
