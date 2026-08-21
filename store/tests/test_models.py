@@ -4,7 +4,7 @@ from store.models import Category, Product
 # Create your tests here.
 class TestCategoriesModel(TestCase):
     def setUp(self) -> None:
-        self.data1 = Category.objects.create(name='django', slug='django')
+        self.data1 = Category.objects.create(name='django')
 
     def test_category_model_entry(self):
         data = self.data1

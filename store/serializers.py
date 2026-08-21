@@ -51,7 +51,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ('id', 'name', 'slug', 'image', 'products')
+        fields = ('id', 'name', 'image', 'products')
 
 class CustomerSerializer(serializers.ModelSerializer):
     # Model stays nullable for historical rows; new orders must carry all three.
