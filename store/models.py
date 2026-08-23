@@ -8,6 +8,11 @@ class Category(models.Model):
     name = models.CharField(max_length=100, db_index=True)
     image = models.ImageField(upload_to="categories/", max_length=255, blank=True, null=True)
     shows_speciality = models.BooleanField(default=False)
+    in_item_list = models.BooleanField(default=True)
+    list_title = models.CharField(max_length=100, blank=True)
+    list_color = models.CharField(max_length=7, blank=True)
+    list_column = models.PositiveSmallIntegerField(default=1)
+    list_order = models.PositiveSmallIntegerField(default=0)
 
     class Meta:
         verbose_name_plural = "categories"
@@ -15,6 +20,10 @@ class Category(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+    @property
+    def block_title(self):
+        return self.list_title or self.name.upper()
 
 
 class Product(models.Model):

@@ -1,14 +1,25 @@
-from django.contrib import admin
+import tempfile
+from pathlib import Path
+
+from django.contrib import admin, messages
+from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.forms import TextInput
+from django.shortcuts import redirect
+from django.urls import path
 from django.utils.html import format_html
+from googleapiclient.errors import HttpError
 
+from store.item_list import drive
+from store.item_list.blocks import build_blocks
+from store.item_list.render import render
 from store.models import Category, Product, Customer, Order, OrderItem
 
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'shows_speciality')
+    list_display = ('name', 'shows_speciality', 'in_item_list', 'list_title',
+                    'list_color', 'list_column', 'list_order')
 
 
 @admin.register(Product)
@@ -24,6 +35,44 @@ class ProductAdmin(admin.ModelAdmin):
         models.TextField: {'widget': TextInput(attrs={'size': 28})},
         models.CharField: {'widget': TextInput(attrs={'size': 16})},
     }
+    def get_urls(self):
+        publish = path(
+            "publish-item-list/",
+            self.admin_site.admin_view(self.publish_view),
+            name="store_product_publish_item_list",
+        )
+        return [publish] + super().get_urls()
+
+    def publish_view(self, request):
+        if request.method == "POST":
+            self.publish(request)
+        return redirect("admin:store_product_changelist")
+
+    def publish(self, request):
+        blocks = build_blocks()
+        if not blocks:
+            self.message_user(
+                request, "No categories are marked for the item list.", messages.ERROR
+            )
+            return
+
+        with tempfile.TemporaryDirectory() as workspace:
+            target = Path(workspace) / "item-list.pdf"
+            pages = render(blocks, str(target))
+            try:
+                uploaded = drive.replace(str(target))
+            except (ImproperlyConfigured, HttpError) as error:
+                self.message_user(request, f"Upload failed: {error}", messages.ERROR)
+                return
+
+        items = sum(len(block.items) for block in blocks)
+        self.message_user(
+            request,
+            f"Published {items} items across {len(blocks)} blocks "
+            f"({pages} pages) to {uploaded['name']}.",
+            messages.SUCCESS,
+        )
+
     def image_preview(self, obj):
         if obj.image:
             return format_html('<img src="{}" style="height:50px;border-radius:4px;" />', obj.image.url)

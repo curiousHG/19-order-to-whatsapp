@@ -82,6 +82,9 @@ EMAIL_BACKEND = os.getenv(
     "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
 )
 
+ITEM_LIST_PDF_FILE_ID = os.getenv("ITEM_LIST_PDF_FILE_ID", "")
+GOOGLE_SERVICE_ACCOUNT_JSON = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON", "")
+
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
         "APP": {

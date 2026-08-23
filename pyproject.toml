@@ -16,6 +16,9 @@ dependencies = [
     "cloudinary>=1.40",
     "django-cloudinary-storage>=0.3",
     "django-allauth[socialaccount]>=65.18.0",
+    "reportlab>=5.0.1",
+    "google-api-python-client>=2.199.0",
+    "google-auth>=2.56.3",
 ]
 
 [dependency-groups]
