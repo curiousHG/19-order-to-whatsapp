@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Search, ShoppingCart } from "lucide-react";
 import { SunBadge } from "@/components/layout/SunBadge";
+import { cn } from "@/lib/utils";
 import { useLang, useLangStore, useT } from "@/lib/i18n";
 import type { Lang } from "@/lib/i18n";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -24,7 +25,15 @@ export function Header({ onSearchClick, onCartClick, cartCount = 0 }: HeaderProp
             <span className="text-white text-lg sm:text-xl font-serif font-bold tracking-wide truncate">
               {t("shopName")}
             </span>
-            <span className="hidden min-[380px]:block text-amber-200 text-[10px] uppercase tracking-[0.25em] mt-0.5 truncate">
+            <span
+              className={cn(
+                "text-amber-200 uppercase mt-0.5 truncate",
+                "sm:text-[10px] sm:tracking-[0.2em]",
+                lang === "hi"
+                  ? "text-[11px]"
+                  : "text-[8px] tracking-normal"
+              )}
+            >
               {t("shopAddress")}
             </span>
           </span>

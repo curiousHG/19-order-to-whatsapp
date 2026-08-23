@@ -24,7 +24,7 @@ function ToggleGroupItem<Value extends string>({
     <TogglePrimitive
       data-slot="toggle-group-item"
       className={cn(
-        "inline-flex items-center justify-center rounded-full px-2.5 py-1 text-[11px] font-semibold",
+        "inline-flex items-center justify-center rounded-full px-2 py-1 text-[11px] font-semibold sm:px-2.5",
         "transition-colors touch-manipulation select-none outline-none",
         "focus-visible:ring-2 focus-visible:ring-white/70",
         "data-unpressed:text-white/70 data-unpressed:hover:text-white",
