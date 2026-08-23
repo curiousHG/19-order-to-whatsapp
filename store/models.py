@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 
 class Category(models.Model):
     name = models.CharField(max_length=100, db_index=True)
+    name_hi = models.CharField(max_length=120, blank=True)
     image = models.ImageField(upload_to="categories/", max_length=255, blank=True, null=True)
     shows_speciality = models.BooleanField(default=False)
     in_item_list = models.BooleanField(default=True)
@@ -32,6 +33,7 @@ class Product(models.Model):
         Category, related_name="products", on_delete=models.CASCADE
     )
     name = models.CharField(max_length=100, db_index=True)
+    name_hi = models.CharField(max_length=120, blank=True)
     brand = models.CharField(max_length=50, blank=True, db_index=True)
     is_speciality = models.BooleanField(default=False, db_index=True)
     # time is utc + 5:30

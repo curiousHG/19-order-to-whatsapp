@@ -18,17 +18,17 @@ from store.models import Category, Product, Customer, Order, OrderItem
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'shows_speciality', 'in_item_list', 'list_title',
-                    'list_color', 'list_column', 'list_order')
+    list_display = ('name', 'name_hi', 'shows_speciality', 'in_item_list',
+                    'list_title', 'list_color', 'list_column', 'list_order')
 
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'brand', 'description', 'unit', 'available', 'is_speciality',
-                    'category', 'price', 'image_preview', 'last_updated']
+    list_display = ['name', 'name_hi', 'brand', 'description', 'unit', 'available',
+                    'is_speciality', 'category', 'price', 'image_preview', 'last_updated']
     list_filter = ['category', 'brand', 'is_speciality', 'available', 'unit']
-    list_editable = ['brand', 'description', 'unit', 'available', 'is_speciality']
-    search_fields = ['name', 'brand', 'description']
+    list_editable = ['name_hi', 'brand', 'description', 'unit', 'available', 'is_speciality']
+    search_fields = ['name', 'name_hi', 'brand', 'description']
     readonly_fields = ['image_preview']
     list_per_page = 50
     formfield_overrides = {
