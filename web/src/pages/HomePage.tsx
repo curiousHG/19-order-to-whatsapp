@@ -3,6 +3,7 @@ import useSWR from "swr";
 import { getCategories } from "@/lib/api";
 import { StoreView } from "@/components/store/StoreView";
 import { Loader } from "@/components/Loader";
+import { useT } from "@/lib/i18n";
 
 const MIN_LOADER_MS = 2000;
 const LOGO_WAIT_CEILING_MS = 5000;
@@ -35,6 +36,7 @@ const useLogoReady = (src: string) => {
 }
 
 export const HomePage = () => {
+  const t = useT();
   const { data: categories, error } = useSWR(
     "categories",
     fetchCategoriesWithMinDelay
@@ -44,7 +46,7 @@ export const HomePage = () => {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-sm text-muted-foreground">Failed to load products.</p>
+        <p className="text-sm text-muted-foreground">{t("failedToLoad")}</p>
       </div>
     );
   }

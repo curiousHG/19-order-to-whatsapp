@@ -4,19 +4,22 @@ import { useCartStore, getUnitsFor, canonicalizeUnit } from "@/lib/cart-store";
 import { ProductThumb } from "@/components/ProductThumb";
 import { QuantityStepper } from "@/components/ui/QuantityStepper";
 import { cn } from "@/lib/utils";
+import { localName, useLang } from "@/lib/i18n";
+import type { Lang } from "@/lib/i18n";
 
 interface ProductRowProps {
   product: Product;
 }
 
-function displayName(p: Product): string {
-  return [p.name, p.brand, (p.description ?? "").trim()]
+function displayName(p: Product, lang: Lang = "en"): string {
+  return [localName(p, lang), p.brand, (p.description ?? "").trim()]
     .filter(Boolean)
     .join(" ");
 }
 
 export function ProductRow({ product }: ProductRowProps) {
   const { items, setItem } = useCartStore();
+  const lang = useLang();
   const cartItem = items.find((i) => i.productId === product.id);
   const units = getUnitsFor(product.unit);
 
@@ -36,7 +39,8 @@ export function ProductRow({ product }: ProductRowProps) {
   function sync(quantity: number, u: string) {
     setItem({
       productId: product.id,
-      name: displayName(product),
+      name: displayName(product, "en"),
+      nameHi: displayName(product, "hi"),
       image: product.image,
       quantity,
       unit: u,
@@ -70,7 +74,9 @@ export function ProductRow({ product }: ProductRowProps) {
       <ProductThumb src={product.image} alt={product.name} />
 
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-base leading-tight">{product.name}</p>
+        <p className="font-medium text-base leading-tight">
+          {localName(product, lang)}
+        </p>
         {(product.brand || product.description) && (
           <p className="text-sm text-muted-foreground truncate">
             {product.brand && (

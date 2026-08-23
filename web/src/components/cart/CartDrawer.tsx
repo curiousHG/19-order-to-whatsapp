@@ -11,6 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { QtyButtons } from "@/components/ui/QtyButtons";
 import { ProductThumb } from "@/components/ProductThumb";
 import { useCartStore } from "@/lib/cart-store";
+import { cartLabel, useLang, useT } from "@/lib/i18n";
 
 interface CartDrawerProps {
   open: boolean;
@@ -20,6 +21,8 @@ interface CartDrawerProps {
 export function CartDrawer({ open, onClose }: CartDrawerProps) {
   const navigate = useNavigate();
   const { items, setItem, removeItem, clearCart } = useCartStore();
+  const t = useT();
+  const lang = useLang();
   const itemCount = items.length;
 
   return (
@@ -33,18 +36,18 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
           <SheetTitle className="flex items-center gap-3 text-white pr-10">
             <span className="flex flex-col leading-none">
               <span className="font-serif font-bold text-lg tracking-wide">
-                Your Cart
+                {t("yourCart")}
               </span>
               <span className="text-amber-200 text-[10px] uppercase tracking-[0.25em] mt-1">
                 {itemCount === 0
-                  ? "Empty"
-                  : `${itemCount} ${itemCount === 1 ? "item" : "items"}`}
+                  ? t("empty")
+                  : `${itemCount} ${itemCount === 1 ? t("item") : t("items")}`}
               </span>
             </span>
           </SheetTitle>
           <button
             onClick={onClose}
-            aria-label="Close cart"
+            aria-label={t("closeCart")}
             className="absolute top-4 right-3 h-8 w-8 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:bg-white/10 active:bg-white/20 transition-colors touch-manipulation"
           >
             <X className="h-4 w-4" />
@@ -55,12 +58,10 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
           <div className="flex-1 flex flex-col items-center justify-center gap-4 px-8 text-center">
             <ShoppingBasket className="h-14 w-14 text-green-600/40" strokeWidth={1.5} />
             <p className="text-sm font-medium text-foreground">
-              Your cart is empty
+              {t("cartEmpty")}
             </p>
             <p className="text-xs text-muted-foreground max-w-[20rem]">
-              Browse the catalog and tap the{" "}
-              <span className="font-semibold">+</span> next to any product to
-              add it here.
+              {t("cartEmptyHint")}
             </p>
           </div>
         ) : (
@@ -80,7 +81,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                       />
                       <span className="flex-1 min-w-0 flex flex-col gap-0.5">
                         <span className="text-sm font-medium leading-snug line-clamp-2">
-                          {item.name}
+                          {cartLabel(item, lang)}
                         </span>
                         <span className="text-sm font-bold text-green-700 tabular-nums">
                           {item.quantity}
@@ -91,7 +92,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                       </span>
                       <button
                         onClick={() => removeItem(item.productId)}
-                        aria-label={`Remove ${item.name}`}
+                        aria-label={`${t("remove")} ${cartLabel(item, lang)}`}
                         className="shrink-0 h-8 w-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-red-50 active:bg-red-100 transition-colors touch-manipulation"
                       >
                         <X className="h-4 w-4" />
@@ -105,6 +106,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                         setItem({
                           productId: item.productId,
                           name: item.name,
+                          nameHi: item.nameHi,
                           image: item.image,
                           quantity: n,
                           unit: item.unit,
@@ -125,13 +127,13 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                 }}
               >
                 <MessageCircle className="h-4 w-4" />
-                Checkout
+                {t("checkout")}
               </Button>
               <button
                 onClick={clearCart}
                 className="w-full text-xs text-muted-foreground hover:text-destructive transition-colors py-1 touch-manipulation"
               >
-                Clear cart
+                {t("clearCart")}
               </button>
             </div>
           </>

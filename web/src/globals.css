@@ -147,3 +147,21 @@
     animation: none;
   }
 }
+
+/* Unlayered on purpose: Tailwind's utilities live in @layer utilities, which
+   outranks every layered rule no matter how specific. Devanagari draws a matra
+   as its own glyph sitting on the consonant, so tracking-* pulls the two apart
+   and the word looks broken. */
+html[lang="hi"] *,
+html[lang="hi"] *::before,
+html[lang="hi"] *::after {
+  letter-spacing: normal;
+}
+
+/* Devanagari stacks matras and anusvara above the headline, so a Latin-sized
+   line box (leading-none) clips them once truncate adds overflow:hidden.
+   line-height:normal defers to the font's own vertical metrics, which reserve
+   that room. */
+html[lang="hi"] :is(p, span, h1, h2, h3, h4, a, button, label, li, div) {
+  line-height: normal;
+}

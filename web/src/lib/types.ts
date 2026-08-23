@@ -2,6 +2,7 @@ export interface Product {
   id: number
   category: number
   name: string
+  name_hi: string
   brand: string
   price: number
   unit: string
@@ -13,6 +14,7 @@ export interface Product {
 export interface Category {
   id: number
   name: string
+  name_hi: string
   image: string | null
   products: Product[]
 }
@@ -20,6 +22,7 @@ export interface Category {
 export interface CartItem {
   productId: number
   name: string
+  nameHi: string
   image: string | null
   quantity: number
   unit: string

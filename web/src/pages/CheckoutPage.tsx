@@ -15,9 +15,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { QtyButtons } from "@/components/ui/QtyButtons";
+import { cartLabel, useLang, useT } from "@/lib/i18n";
 
 export const CheckoutPage = () => {
   const { items, setItem, removeItem, clearCart } = useCartStore();
+  const t = useT();
+  const lang = useLang();
   // Persisted across visits via localStorage["customer"].
   const customer = useCustomerStore();
   const setCustomer = useCustomerStore((s) => s.setCustomer);
@@ -78,15 +81,15 @@ export const CheckoutPage = () => {
     const customerPhone = phoneDigits ? `+91 ${phoneDigits}` : "";
 
     if (!customerName) {
-      toast.error("Enter your name", {
-        description: "The shop needs a name to label your order.",
+      toast.error(t("errEnterName"), {
+        description: t("errEnterNameDesc"),
       });
       nameInputRef.current?.focus();
       return;
     }
 
     if (phoneDigits.length !== 10) {
-      toast.error("Enter a 10-digit phone number", {
+      toast.error(t("errEnterPhone"), {
         description: "The shop needs a number to confirm your order.",
       });
       phoneInputRef.current?.focus();
@@ -94,8 +97,8 @@ export const CheckoutPage = () => {
     }
 
     if (!customerAddress) {
-      toast.error("Enter your delivery address", {
-        description: "The shop needs somewhere to deliver to.",
+      toast.error(t("errEnterAddress"), {
+        description: t("errEnterAddressDesc"),
       });
       addressInputRef.current?.focus();
       return;
@@ -126,7 +129,7 @@ export const CheckoutPage = () => {
         err instanceof Error && err.message
           ? err.message
           : "Could not submit order. Please check your connection and try again.";
-      toast.error("Order failed", { description: message });
+      toast.error(t("errOrderFailed"), { description: message });
       setLoading(false);
     }
   }
@@ -146,10 +149,10 @@ export const CheckoutPage = () => {
             {/* Order summary */}
             <div className="px-5 py-4 border-b border-border bg-amber-50/40">
               <h2 className="text-xs font-semibold tracking-[0.2em] uppercase text-amber-800">
-                Order summary
+                {t("orderSummary")}
               </h2>
               <p className="text-[11px] text-muted-foreground mt-0.5">
-                The shop will confirm the final amount on WhatsApp
+                {t("confirmAmount")}
               </p>
             </div>
             <ul className="divide-y divide-border">
@@ -163,7 +166,7 @@ export const CheckoutPage = () => {
                     />
                     <span className="flex-1 min-w-0 flex flex-col gap-0.5">
                       <span className="text-sm font-medium leading-snug line-clamp-2">
-                        {item.name}
+                        {cartLabel(item, lang)}
                       </span>
                       <span className="text-sm font-bold text-green-700 tabular-nums">
                         {item.quantity}
@@ -175,7 +178,7 @@ export const CheckoutPage = () => {
                     <button
                       type="button"
                       onClick={() => removeItem(item.productId)}
-                      aria-label={`Remove ${item.name}`}
+                      aria-label={`${t("remove")} ${cartLabel(item, lang)}`}
                       className="shrink-0 h-8 w-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-red-50 active:bg-red-100 transition-colors touch-manipulation"
                     >
                       <X className="h-4 w-4" />
@@ -189,6 +192,7 @@ export const CheckoutPage = () => {
                       setItem({
                         productId: item.productId,
                         name: item.name,
+                        nameHi: item.nameHi,
                         image: item.image,
                         quantity: n,
                         unit: item.unit,
@@ -204,7 +208,7 @@ export const CheckoutPage = () => {
             {/* Delivery details */}
             <div className="px-5 py-5 space-y-4">
               <h2 className="text-xs font-semibold tracking-[0.2em] uppercase text-amber-800">
-                Delivery details
+                {t("deliveryDetails")}
               </h2>
 
               {/* Plain <a>: the browser must leave the SPA for the OAuth round-trip. */}
@@ -215,7 +219,7 @@ export const CheckoutPage = () => {
                     href="/accounts/logout/?next=/checkout"
                     className="text-green-700 hover:underline"
                   >
-                    Not you?
+                    {t("notYou")}
                   </a>
                 </p>
               ) : (
@@ -225,7 +229,7 @@ export const CheckoutPage = () => {
                     className="flex items-center justify-center gap-2 w-full h-10 rounded-md border border-border bg-white text-sm font-medium text-foreground hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation"
                   >
                     <GoogleG className="h-4 w-4" />
-                    Sign in with Google
+                    {t("signInWithGoogle")}
                   </a>
                   <div className="flex items-center gap-3 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
                     <span className="flex-1 h-px bg-border" />
@@ -240,7 +244,7 @@ export const CheckoutPage = () => {
                   className="text-sm font-medium flex items-center gap-1"
                   htmlFor="name"
                 >
-                  Name
+                  {t("labelName")}
                   <span className="text-destructive" aria-hidden>
                     *
                   </span>
@@ -250,7 +254,7 @@ export const CheckoutPage = () => {
                   id="name"
                   value={customer.name}
                   onChange={(e) => setCustomer({ name: e.target.value })}
-                  placeholder="Your name"
+                  placeholder={t("namePlaceholder")}
                   autoComplete="name"
                   required
                   className="h-10"
@@ -262,7 +266,7 @@ export const CheckoutPage = () => {
                   className="text-sm font-medium flex items-center gap-1"
                   htmlFor="phone"
                 >
-                  Phone
+                  {t("labelPhone")}
                   <span className="text-destructive" aria-hidden>
                     *
                   </span>
@@ -300,7 +304,7 @@ export const CheckoutPage = () => {
                   className="text-sm font-medium flex items-center gap-1"
                   htmlFor="email"
                 >
-                  Email
+                  {t("labelEmail")}
                   <span className="text-xs text-muted-foreground font-normal">
                     (optional)
                   </span>
@@ -321,7 +325,7 @@ export const CheckoutPage = () => {
                   className="text-sm font-medium flex items-center gap-1"
                   htmlFor="address"
                 >
-                  Delivery address
+                  {t("labelAddress")}
                   <span className="text-destructive" aria-hidden>
                     *
                   </span>
@@ -345,12 +349,11 @@ export const CheckoutPage = () => {
                 className="w-full h-11 bg-green-600 hover:bg-green-700 text-white gap-2 text-sm font-semibold shadow-sm"
               >
                 <MessageCircle className="h-4 w-4" />
-                {loading ? "Submitting…" : "Submit & Open WhatsApp"}
+                {loading ? t("submitting") : t("submitAndOpenWhatsApp")}
               </Button>
 
               <p className="text-[11px] text-center text-muted-foreground">
-                Your order is recorded with us and sent to the shop via
-                WhatsApp.
+                {t("orderRecorded")}
               </p>
             </div>
           </form>
@@ -361,12 +364,13 @@ export const CheckoutPage = () => {
 }
 
 function CheckoutHeader() {
+  const t = useT();
   return (
     <header className="sticky top-0 z-40 bg-green-600 text-white shadow-md">
       <div className="relative max-w-2xl mx-auto h-16 flex items-center justify-center px-3">
         <Link
           to="/"
-          aria-label="Back to shop"
+          aria-label={t("backToShop")}
           className="absolute left-2 h-10 w-10 rounded-full flex items-center justify-center text-white hover:bg-white/10 active:bg-white/20 transition-colors touch-manipulation"
         >
           <ArrowLeft className="h-5 w-5" />
@@ -375,10 +379,10 @@ function CheckoutHeader() {
           <SunBadge className="h-9 w-9" />
           <span className="flex flex-col leading-none">
             <span className="font-serif font-bold text-base tracking-wide">
-              Khari Baoli
+              {t("shopName")}
             </span>
             <span className="text-amber-200 text-[10px] uppercase tracking-[0.25em] mt-0.5">
-              Confirm order
+              {t("confirmOrder")}
             </span>
           </span>
         </div>
@@ -412,15 +416,16 @@ function GoogleG({ className }: { className?: string }) {
 }
 
 function EmptyState() {
+  const t = useT();
   return (
     <div className="bg-white rounded-2xl border border-border shadow-sm p-10 text-center space-y-3">
       <ShoppingCart className="h-10 w-10 text-muted-foreground mx-auto" />
-      <p className="text-sm font-medium text-foreground">Your cart is empty</p>
+      <p className="text-sm font-medium text-foreground">{t("cartEmpty")}</p>
       <Link
         to="/"
         className="inline-block text-green-700 font-semibold hover:underline"
       >
-        ← Back to shop
+        ← {t("backToShop")}
       </Link>
     </div>
   );

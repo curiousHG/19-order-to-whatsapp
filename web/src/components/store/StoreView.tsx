@@ -7,6 +7,7 @@ import { CartDrawer } from "@/components/cart/CartDrawer";
 import { ProductRow } from "@/components/store/ProductRow";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { localName, useLang, useT } from "@/lib/i18n";
 
 interface StoreViewProps {
   categories: Category[];
@@ -15,6 +16,8 @@ interface StoreViewProps {
 const SEARCH_LIMIT = 7;
 
 export function StoreView({ categories }: StoreViewProps) {
+  const t = useT();
+  const lang = useLang();
   const [activeId, setActiveId] = useState<number | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -57,10 +60,12 @@ export function StoreView({ categories }: StoreViewProps) {
     return allProducts
       .map((p) => {
         const name = p.name.toLowerCase();
+        const hindi = (p.name_hi ?? "").toLowerCase();
         const desc = (p.description ?? "").toLowerCase();
         const i = name.indexOf(q);
+        const h = hindi.indexOf(q);
         const j = desc.indexOf(q);
-        const score = i >= 0 ? i : j >= 0 ? 1000 + j : -1;
+        const score = i >= 0 ? i : h >= 0 ? h : j >= 0 ? 1000 + j : -1;
         return { p, score };
       })
       .filter((x) => x.score >= 0)
@@ -94,7 +99,7 @@ export function StoreView({ categories }: StoreViewProps) {
                 : "bg-white/15 text-white hover:bg-white/25"
             )}
           >
-            {cat.name}
+            {localName(cat, lang)}
           </button>
         ))}
       </div>
@@ -112,7 +117,7 @@ export function StoreView({ categories }: StoreViewProps) {
                   : "text-foreground hover:bg-green-50"
               )}
             >
-              {cat.name}
+              {localName(cat, lang)}
             </button>
           ))}
         </aside>
@@ -128,7 +133,7 @@ export function StoreView({ categories }: StoreViewProps) {
 
               {visibleProducts.length === 0 ? (
                 <p className="px-4 py-10 text-sm text-muted-foreground text-center">
-                  No items available in this category
+                  {t("noItemsInCategory")}
                 </p>
               ) : (
                 visibleProducts.map((product) => (
@@ -147,7 +152,7 @@ export function StoreView({ categories }: StoreViewProps) {
             <Input
               autoFocus
               type="search"
-              placeholder="Search products…"
+              placeholder={t("searchPlaceholder")}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="flex-1 h-10 border-0 focus-visible:ring-0 shadow-none bg-transparent px-0"
@@ -155,7 +160,7 @@ export function StoreView({ categories }: StoreViewProps) {
             {query && (
               <button
                 onClick={() => setQuery("")}
-                aria-label="Clear input"
+                aria-label={t("clearInput")}
                 className="shrink-0 p-1.5 rounded-full hover:bg-gray-100 touch-manipulation"
               >
                 <X className="h-4 w-4 text-muted-foreground" />
@@ -165,14 +170,14 @@ export function StoreView({ categories }: StoreViewProps) {
               onClick={closeSearch}
               className="shrink-0 text-sm font-medium text-green-600 px-3 py-2 touch-manipulation"
             >
-              Cancel
+              {t("cancel")}
             </button>
           </div>
 
           <div className="flex-1 overflow-y-auto pb-20">
             {!trimmedQuery ? (
               <p className="px-4 py-10 text-sm text-muted-foreground text-center">
-                Start typing to search across all products
+                {t("startTyping")}
               </p>
             ) : searchResults.length === 0 ? (
               <p className="px-4 py-10 text-sm text-muted-foreground text-center">
@@ -199,6 +204,8 @@ function CategoryHero({
   category: Category;
   count: number;
 }) {
+  const t = useT();
+  const lang = useLang();
   const [failed, setFailed] = useState(false);
   const showImage = Boolean(category.image) && !failed;
   return (
@@ -218,10 +225,10 @@ function CategoryHero({
       )}
       <div className="relative h-full flex flex-col justify-end px-4 py-3">
         <h2 className="text-2xl font-bold text-white drop-shadow-sm">
-          {category.name}
+          {localName(category, lang)}
         </h2>
         <p className="text-xs text-white/90 drop-shadow-sm">
-          {count} {count === 1 ? "item" : "items"}
+          {count} {count === 1 ? t("item") : t("items")}
         </p>
       </div>
     </div>
