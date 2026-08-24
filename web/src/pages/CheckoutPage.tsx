@@ -9,6 +9,7 @@ import {
   buildWhatsAppUrl,
 } from "@/lib/cart-store";
 import { getMe, postOrder } from "@/lib/api";
+import { trackOrderThenNavigate } from "@/lib/analytics";
 import { SunBadge } from "@/components/layout/SunBadge";
 import { ProductThumb } from "@/components/ProductThumb";
 import { Button } from "@/components/ui/button";
@@ -120,9 +121,12 @@ export const CheckoutPage = () => {
       });
       const snapshot = [...items];
       clearCart();
-      window.location.href = buildWhatsAppUrl(
-        { name: customerName, address: customerAddress },
-        snapshot
+      trackOrderThenNavigate(
+        snapshot,
+        buildWhatsAppUrl(
+          { name: customerName, address: customerAddress },
+          snapshot
+        )
       );
     } catch (err) {
       const message =
