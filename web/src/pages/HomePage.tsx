@@ -45,7 +45,7 @@ export const HomePage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-dvh flex items-center justify-center">
         <p className="text-sm text-muted-foreground">{t("failedToLoad")}</p>
       </div>
     );

@@ -4,7 +4,7 @@ import { useT } from "@/lib/i18n";
 export function Loader() {
   const t = useT();
   return (
-    <div className="min-h-screen flex items-center justify-center animate-loader-bg-glow">
+    <div className="min-h-dvh flex items-center justify-center animate-loader-bg-glow">
       <div className="text-center">
         <img
           src="/logo.webp"
