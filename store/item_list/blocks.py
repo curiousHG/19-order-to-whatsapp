@@ -2,9 +2,8 @@ import re
 from collections import Counter
 from dataclasses import dataclass
 
+from store.item_list.constants import DEFAULT_BLOCK_FILL, SPECIALITY_PREFIX
 from store.models import Category, Product
-
-SPECIALITY_PREFIX = "*"
 
 
 def printable(text):
@@ -83,7 +82,7 @@ def build_blocks():
         blocks.append(
             Block(
                 title=category.block_title,
-                color=category.list_color or "#FFFFFF",
+                color=category.list_color or DEFAULT_BLOCK_FILL,
                 column=category.list_column,
                 order=category.list_order,
                 items=items,

@@ -1,43 +1,25 @@
 from xml.sax.saxutils import escape
 
 from reportlab.lib import colors
-from reportlab.lib.pagesizes import letter
-from reportlab.lib.styles import ParagraphStyle
-from reportlab.lib.units import inch
 from reportlab.pdfbase.pdfmetrics import stringWidth
 from reportlab.platypus import (BaseDocTemplate, Frame, PageBreak, PageTemplate,
                                 Paragraph, Table, TableStyle)
 
-SHOP_NAME = "19no KHARI BAOLI"
-LIST_NAME = "ITEM LIST"
-
-MARGIN = 0.4 * inch
-PAIRS_PER_PAGE = 3
-BANNER_HEIGHT = 26
-SUBTITLE_HEIGHT = 20
-ROW_HEIGHT = 14.2
-ITEM_FONT = 8.5
-MIN_FONT = 5.5
-CELL_PADDING = 2
-
-COLUMN_UNITS = [
-    [(18.29, 5.0), (28.14, 5.0), (22.14, 6.0)],
-    [(19.57, 5.57), (19.57, 6.14), (22.43, 6.14)],
-]
-
-BANNER_FILL = colors.HexColor("#E9FF45")
-SUBTITLE_FILL = colors.HexColor("#73E1F5")
-BORDER = colors.HexColor("#9A9A9A")
-
-TITLE_STYLE = ParagraphStyle(
-    "block-title", fontName="Times-Bold", fontSize=9.5, leading=11, alignment=1
-)
+from store.item_list.constants import (BANNER_FILL, BANNER_FONT, BANNER_HEIGHT,
+                                       BANNER_SIZE, BODY_FONT, BORDER,
+                                       CELL_PADDING, COLUMN_UNITS, GRID_WIDTH,
+                                       HEADER_SIZE, ITEM_SIZE, LIST_NAME,
+                                       MARGIN, MIN_SIZE, NAME_HEADER,
+                                       PAGE_SIZE, PAIRS_PER_PAGE, ROW_HEIGHT,
+                                       SHOP_NAME, SIZE_STEP, SUBTITLE_FILL,
+                                       SUBTITLE_HEIGHT, SUBTITLE_SIZE,
+                                       TITLE_STYLE, WEIGHT_FONT, WEIGHT_HEADER)
 
 
-def fitted_size(text, width, font="Times-Bold", size=ITEM_FONT):
+def fitted_size(text, width, font=BODY_FONT, size=ITEM_SIZE):
     usable = width - 2 * CELL_PADDING
-    while size > MIN_FONT and stringWidth(text, font, size) > usable:
-        size -= 0.25
+    while size > MIN_SIZE and stringWidth(text, font, size) > usable:
+        size -= SIZE_STEP
     return size
 
 
@@ -48,7 +30,7 @@ class Cell:
         self.color = color
 
 
-def rows_per_column(page_height=letter[1]):
+def rows_per_column(page_height=PAGE_SIZE[1]):
     usable = page_height - 2 * MARGIN - BANNER_HEIGHT - SUBTITLE_HEIGHT
     return int(usable // ROW_HEIGHT)
 
@@ -107,11 +89,11 @@ def page_tables(columns, rows, width):
 
         data = [[SHOP_NAME, "", "", "", "", ""], [LIST_NAME, "", "", "", "", ""]]
         style = [
-            ("GRID", (0, 0), (-1, -1), 0.5, BORDER),
+            ("GRID", (0, 0), (-1, -1), GRID_WIDTH, BORDER),
             ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
             ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-            ("FONTNAME", (0, 0), (-1, -1), "Times-Bold"),
-            ("FONTSIZE", (0, 2), (-1, -1), ITEM_FONT),
+            ("FONTNAME", (0, 0), (-1, -1), BODY_FONT),
+            ("FONTSIZE", (0, 2), (-1, -1), ITEM_SIZE),
             ("LEFTPADDING", (0, 2), (-1, -1), CELL_PADDING),
             ("RIGHTPADDING", (0, 2), (-1, -1), CELL_PADDING),
             ("TOPPADDING", (0, 2), (-1, -1), 0),
@@ -120,8 +102,9 @@ def page_tables(columns, rows, width):
             ("SPAN", (0, 1), (5, 1)),
             ("BACKGROUND", (0, 0), (5, 0), BANNER_FILL),
             ("BACKGROUND", (0, 1), (5, 1), SUBTITLE_FILL),
-            ("FONTSIZE", (0, 0), (5, 0), 17),
-            ("FONTSIZE", (0, 1), (5, 1), 12),
+            ("FONTNAME", (0, 0), (5, 1), BANNER_FONT),
+            ("FONTSIZE", (0, 0), (5, 0), BANNER_SIZE),
+            ("FONTSIZE", (0, 1), (5, 1), SUBTITLE_SIZE),
         ]
 
         for index in range(rows):
@@ -143,9 +126,14 @@ def page_tables(columns, rows, width):
                             ("BACKGROUND", (name_col, row), (wgt_col, row), fill)
                         )
                 elif cell.kind == "header":
-                    data[row][name_col] = "Item Name"
-                    data[row][wgt_col] = "Wgt"
-                    style.append(("FONTSIZE", (name_col, row), (wgt_col, row), 9))
+                    data[row][name_col] = NAME_HEADER
+                    data[row][wgt_col] = WEIGHT_HEADER
+                    style.append(
+                        ("FONTSIZE", (name_col, row), (wgt_col, row), HEADER_SIZE)
+                    )
+                    style.append(
+                        ("FONTNAME", (wgt_col, row), (wgt_col, row), WEIGHT_FONT)
+                    )
                 else:
                     data[row][name_col] = cell.text
                     if fill:
@@ -153,7 +141,7 @@ def page_tables(columns, rows, width):
                             ("BACKGROUND", (name_col, row), (name_col, row), fill)
                         )
                     size = fitted_size(cell.text, widths[name_col])
-                    if size < ITEM_FONT:
+                    if size < ITEM_SIZE:
                         style.append(
                             ("FONTSIZE", (name_col, row), (name_col, row), size)
                         )
@@ -167,10 +155,10 @@ def page_tables(columns, rows, width):
 
 
 def render(blocks, target):
-    width = letter[0] - 2 * MARGIN
-    height = letter[1] - 2 * MARGIN
+    width = PAGE_SIZE[0] - 2 * MARGIN
+    height = PAGE_SIZE[1] - 2 * MARGIN
 
-    document = BaseDocTemplate(target, pagesize=letter, title=LIST_NAME)
+    document = BaseDocTemplate(target, pagesize=PAGE_SIZE, title=LIST_NAME)
     frame = Frame(
         MARGIN, MARGIN, width, height,
         leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0,
