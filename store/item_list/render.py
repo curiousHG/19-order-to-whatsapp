@@ -46,9 +46,41 @@ def lay_out(blocks, rows):
     def cells(index):
         return columns.setdefault(index, [])
 
+    def vacancy(index):
+        return rows - len(columns.get(index, ()))
+
+    def page_of(column):
+        return column // PAIRS_PER_PAGE
+
+    def spanned(count, start):
+        used = []
+        titled = False
+        column = start
+        while count > 0:
+            room = vacancy(column) - (1 if titled else 2)
+            if room <= 0:
+                column += 1
+                continue
+            titled = True
+            count -= min(count, room)
+            used.append(column)
+            column += 1
+        return used
+
+    def whole_page_start(count, cursor):
+        used = spanned(count, cursor)
+        if not used or page_of(used[0]) == page_of(used[-1]):
+            return cursor
+        fresh = (page_of(cursor) + 1) * PAIRS_PER_PAGE
+        moved = spanned(count, fresh)
+        if page_of(moved[0]) == page_of(moved[-1]):
+            return fresh
+        return cursor
+
     cursor = 0
     for block in blocks:
         cursor = max(cursor, block.column - 1)
+        cursor = whole_page_start(len(block.items), cursor)
         remaining = list(block.items)
         titled = False
 

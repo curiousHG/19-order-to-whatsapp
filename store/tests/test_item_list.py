@@ -15,6 +15,7 @@ from store.item_list import drive
 
 from store.item_list.blocks import (build_blocks, clean_description,
                                     default_label, labels_for, printable)
+from store.item_list.constants import PAIRS_PER_PAGE
 from store.item_list.render import Cell, lay_out, render
 from store.models import Category, Product
 
@@ -142,6 +143,23 @@ class LayoutTests(TestCase):
         self.assertEqual(len(columns), 3)
         self.assertEqual(self.kinds(columns[1]), ["gap"] * 20)
         self.assertEqual(columns[2][0].kind, "title")
+
+    def test_a_block_moves_to_the_next_page_rather_than_straddle_one(self):
+        columns = lay_out(
+            [self.block("DAL", 22), self.block("RICE", 8)], rows=10
+        )
+
+        rice = [index for index, column in enumerate(columns)
+                if any(cell.text.startswith("RICE") for cell in column)]
+        self.assertEqual(rice, [PAIRS_PER_PAGE])
+        self.assertEqual(columns[2][-1].kind, "gap")
+
+    def test_a_block_larger_than_a_page_still_splits(self):
+        columns = lay_out([self.block("MASALA", 60)], rows=10)
+
+        placed = sum(cell.kind == "item" for column in columns for cell in column)
+        self.assertEqual(placed, 60)
+        self.assertGreater(len(columns), PAIRS_PER_PAGE)
 
     def test_columns_are_padded_to_a_uniform_height(self):
         columns = lay_out([self.block("DAL", 3)], rows=20)
