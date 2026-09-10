@@ -7,13 +7,18 @@ from reportlab.platypus import (BaseDocTemplate, Frame, PageBreak, PageTemplate,
 
 from store.item_list.constants import (BANNER_FILL, BANNER_FONT, BANNER_HEIGHT,
                                        BANNER_SIZE, BODY_FONT, BORDER,
-                                       CELL_PADDING, COLUMN_UNITS, GRID_WIDTH,
+                                       CAP_HEIGHTS, CELL_PADDING,
+                                       COLUMN_UNITS, GRID_WIDTH,
                                        HEADER_SIZE, ITEM_SIZE, LIST_NAME,
                                        MARGIN, MIN_SIZE, NAME_HEADER,
                                        PAGE_SIZE, PAIRS_PER_PAGE, ROW_HEIGHT,
                                        SHOP_NAME, SIZE_STEP, SUBTITLE_FILL,
                                        SUBTITLE_HEIGHT, SUBTITLE_SIZE,
                                        TITLE_STYLE, WEIGHT_FONT, WEIGHT_HEADER)
+
+
+def middle_leading(font, size):
+    return (2 - CAP_HEIGHTS[font]) * size
 
 
 def fitted_size(text, width, font=BODY_FONT, size=ITEM_SIZE):
@@ -94,6 +99,7 @@ def page_tables(columns, rows, width):
             ("ALIGN", (0, 0), (-1, -1), "CENTER"),
             ("FONTNAME", (0, 0), (-1, -1), BODY_FONT),
             ("FONTSIZE", (0, 2), (-1, -1), ITEM_SIZE),
+            ("LEADING", (0, 2), (-1, -1), middle_leading(BODY_FONT, ITEM_SIZE)),
             ("LEFTPADDING", (0, 2), (-1, -1), CELL_PADDING),
             ("RIGHTPADDING", (0, 2), (-1, -1), CELL_PADDING),
             ("TOPPADDING", (0, 2), (-1, -1), 0),
@@ -105,6 +111,8 @@ def page_tables(columns, rows, width):
             ("FONTNAME", (0, 0), (5, 1), BANNER_FONT),
             ("FONTSIZE", (0, 0), (5, 0), BANNER_SIZE),
             ("FONTSIZE", (0, 1), (5, 1), SUBTITLE_SIZE),
+            ("LEADING", (0, 0), (5, 0), middle_leading(BANNER_FONT, BANNER_SIZE)),
+            ("LEADING", (0, 1), (5, 1), middle_leading(BANNER_FONT, SUBTITLE_SIZE)),
         ]
 
         for index in range(rows):
@@ -132,6 +140,10 @@ def page_tables(columns, rows, width):
                         ("FONTSIZE", (name_col, row), (wgt_col, row), HEADER_SIZE)
                     )
                     style.append(
+                        ("LEADING", (name_col, row), (wgt_col, row),
+                         middle_leading(BODY_FONT, HEADER_SIZE))
+                    )
+                    style.append(
                         ("FONTNAME", (wgt_col, row), (wgt_col, row), WEIGHT_FONT)
                     )
                 else:
@@ -144,6 +156,10 @@ def page_tables(columns, rows, width):
                     if size < ITEM_SIZE:
                         style.append(
                             ("FONTSIZE", (name_col, row), (name_col, row), size)
+                        )
+                        style.append(
+                            ("LEADING", (name_col, row), (name_col, row),
+                             middle_leading(BODY_FONT, size))
                         )
 
         heights = [BANNER_HEIGHT, SUBTITLE_HEIGHT] + [ROW_HEIGHT] * rows
